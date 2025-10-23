@@ -9,10 +9,12 @@ public class PlayerMove : MonoBehaviour
 
     private Rigidbody2D playerRb;
     private Vector2 moveInput;
+    private SpriteRenderer sr; // 플립용 스프라이트 렌더러
 
     private void Awake()
     {
         playerRb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>(); // 스프라이트 렌더러 참조
     }
 
     void Update()
@@ -20,10 +22,20 @@ public class PlayerMove : MonoBehaviour
         moveInput.x = Input.GetAxisRaw("Horizontal");
         moveInput.y = Input.GetAxisRaw("Vertical");
         moveInput.Normalize();
-    }
-    private void FixedUpdate()
-    {
-        playerRb.MovePosition(playerRb.position + moveInput*moveSpeed*Time.fixedDeltaTime);
+
+        // --- 좌우 이동시 플립 처리 ---
+        if (moveInput.x > 0)
+        {
+            sr.flipX = false;
+        }
+        else if (moveInput.x < 0)
+        {
+            sr.flipX = true;
+        }
     }
 
+    private void FixedUpdate()
+    {
+        playerRb.MovePosition(playerRb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+    }
 }
