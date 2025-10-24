@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
+// 투사체 (총알) 동작 처리
 public class Bullet : MonoBehaviour
 {
     public float lifetime = 2f;
@@ -19,7 +17,7 @@ public class Bullet : MonoBehaviour
         {
             Monster monster = other.GetComponent<Monster>();
             if (monster != null)
-                monster.TakeDamage(damage);
+                monster.ReceiveDamage(damage);
 
             Destroy(gameObject);
         }
