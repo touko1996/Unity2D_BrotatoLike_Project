@@ -7,40 +7,44 @@ public class WeaponShooter : MonoBehaviour
     public Transform player;
     public WeaponData weaponData;
 
-    private PlayerStats playerStats;
-    private float cooldownTimer = 0f;
-
+    private PlayerStats _playerStats;
+    private float _cooldownTimer = 0f;
     void Start()
     {
+        if (player == null)
+            player = GameObject.FindWithTag("Player").transform;
+
+        // 씬에서 실제 PlayerStats를 강제로 찾아서 연결
+        _playerStats = FindObjectOfType<PlayerStats>();
+    }
+    // 무기가 활성화될 때마다 PlayerStats를 재연결
+    void OnEnable()
+    {
         if (player != null)
-            playerStats = player.GetComponent<PlayerStats>();
+            _playerStats = player.GetComponent<PlayerStats>();
     }
 
     void Update()
     {
         if (player == null || weaponData == null) return;
 
-        // 가장 가까운 몬스터 찾기
         GameObject nearestEnemy = FindClosestEnemy();
         if (nearestEnemy == null) return;
 
-        // 조준 방향 계산
         Vector2 direction = (nearestEnemy.transform.position - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        // 공격 쿨타임 계산
-        float attackSpeed = playerStats != null ? playerStats.currentAttackSpeed : weaponData.fireRate;
-        cooldownTimer -= Time.deltaTime;
+        float attackSpeed = _playerStats != null ? _playerStats.currentAttackSpeed : weaponData.fireRate;
+        _cooldownTimer -= Time.deltaTime;
 
-        if (cooldownTimer <= 0f)
+        if (_cooldownTimer <= 0f)
         {
             FireProjectile(direction);
-            cooldownTimer = 1f / attackSpeed;
+            _cooldownTimer = 1f / attackSpeed;
         }
     }
 
-    // 투사체 발사
     void FireProjectile(Vector2 direction)
     {
         if (weaponData.projectilePrefab == null) return;
@@ -50,21 +54,30 @@ public class WeaponShooter : MonoBehaviour
         if (rb != null)
             rb.velocity = direction * weaponData.projectileSpeed;
 
-        float finalDamage = playerStats != null ? playerStats.currentDamage : weaponData.damage;
+        // 플레이어 공격력 + 무기 공격력 합산
+        float baseDamage = _playerStats != null ? _playerStats.currentDamage : 0f;
+        float weaponDamage = weaponData.damage;
+        float finalDamage = baseDamage + weaponDamage;
 
         Bullet bullet = bulletObj.GetComponent<Bullet>();
         if (bullet != null)
             bullet.damage = finalDamage;
 
-        Debug.Log($"{weaponData.itemName} 발사! (공격력 {finalDamage})");
+        // 콘솔 로그 출력
+        string weaponName = string.IsNullOrEmpty(weaponData.itemName) ? "Unnamed Weapon" : weaponData.itemName;
+        Debug.Log(
+            "[" + weaponName + "] 발사됨\n" +
+            "기본 공격력: " + baseDamage + "\n" +
+            "무기 공격력: " + weaponDamage + "\n" +
+            "최종 공격력: " + finalDamage
+        );
     }
 
-    // 가장 가까운 적 찾기
     GameObject FindClosestEnemy()
     {
         GameObject[] monsters = GameObject.FindGameObjectsWithTag("Monster");
         GameObject nearestEnemy = null;
-        float range = playerStats != null ? playerStats.currentRange : weaponData.detectionRange;
+        float range = _playerStats != null ? _playerStats.currentRange : weaponData.detectionRange;
         float minDistance = range;
 
         foreach (GameObject monster in monsters)

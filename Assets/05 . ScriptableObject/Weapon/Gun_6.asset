@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c5be47863ea92439acbd9180021470, type: 3}
   m_Name: Gun_6
   m_EditorClassIdentifier: 
-  itemName: 
+  itemName: Launcher
   description: 
   itemSprite: {fileID: 21300000, guid: 8c0825fa8beb29d4096a7afea48b5fca, type: 3}
   price: 0

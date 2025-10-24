@@ -43,10 +43,12 @@ public class PlayerTester : MonoBehaviour
                 passive.ApplyEffect(gameObject);
         }
 
+        
+
         // 현재 스탯 로그 출력
-        Debug.Log($"공격력: {_playerStats.currentDamage}");
-        Debug.Log($"사정거리: {_playerStats.currentRange}");
-        Debug.Log($"공격속도: {_playerStats.currentAttackSpeed}");
-        Debug.Log($"이동속도: {_playerStats.currentMoveSpeed}");
+        Debug.Log("공격력: " + _playerStats.currentDamage);
+        Debug.Log("사정거리: " + _playerStats.currentRange);
+        Debug.Log("공격속도: " + _playerStats.currentAttackSpeed);
+        Debug.Log("이동속도: " + _playerStats.currentMoveSpeed);
     }
 }

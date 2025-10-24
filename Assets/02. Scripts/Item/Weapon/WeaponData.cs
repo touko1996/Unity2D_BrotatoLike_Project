@@ -35,25 +35,29 @@ public class WeaponData : Item
         {
             if (shooter != null && shooter.weaponData == this)
             {
-                Debug.LogWarning($"{itemName}은(는) 이미 장착되어 있습니다.");
+                Debug.LogWarning(itemName + "은(는) 이미 장착되어 있습니다.");
                 return;
             }
         }
 
-        // 무기 생성 및 설정
+        // 무기 오브젝트 생성 및 슬롯에 배치
         GameObject weaponObj = new GameObject(itemName);
         weaponObj.transform.SetParent(emptySlot);
         weaponObj.transform.localPosition = Vector3.zero;
 
+        // 무기 컴포넌트 설정
         WeaponShooter newShooter = weaponObj.AddComponent<WeaponShooter>();
-        newShooter.player = player.transform;
+
+        // 핵심 수정 부분: WeaponRoot가 아닌 Player 본체를 참조하도록 변경
+        newShooter.player = player.transform.root;
         newShooter.weaponData = this;
 
+        // 스프라이트 추가
         SpriteRenderer spriteRenderer = weaponObj.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = itemSprite;
         spriteRenderer.sortingOrder = 5;
 
         equippedWeapons.Add(newShooter);
-        Debug.Log($"{itemName} 장착 완료 ({slotManager.GetCurrentWeaponCount()}/6)");
+        Debug.Log(itemName + " 장착 완료 (" + slotManager.GetCurrentWeaponCount() + "/6)");
     }
 }
