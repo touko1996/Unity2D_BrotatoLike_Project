@@ -32,6 +32,9 @@ public class PlayerMove : MonoBehaviour
         {
             sr.flipX = true;
         }
+
+        bool isMoving = Mathf.Abs(moveInput.x) > 0.1f || Mathf.Abs(moveInput.y) > 0.1f;
+        GetComponent<PlayerAnimation>().SetRunning(isMoving);
     }
 
     private void FixedUpdate()
