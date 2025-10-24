@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 무기 정보 (ScriptableObject)
 [CreateAssetMenu(fileName = "NewWeaponData", menuName = "Items/WeaponData")]
 public class WeaponData : Item
 {
@@ -12,52 +12,48 @@ public class WeaponData : Item
     public float projectileSpeed = 10f;
     public float detectionRange = 8f;
 
-    private static List<WeaponOrbit> equippedWeapons = new List<WeaponOrbit>();
+    private static List<WeaponShooter> equippedWeapons = new List<WeaponShooter>();
 
     public override void ApplyEffect(GameObject player)
     {
-        if (equippedWeapons.Count >= 6)
+        WeaponSlotManager slotManager = player.GetComponent<WeaponSlotManager>();
+        if (slotManager == null)
         {
-            Debug.LogWarning("최대 6개까지 장착 가능합니다!");
+            Debug.LogError("WeaponSlotManager가 없습니다. Player에 추가하세요.");
             return;
         }
 
-        foreach (var w in equippedWeapons)
+        Transform emptySlot = slotManager.GetEmptySlot();
+        if (emptySlot == null)
         {
-            if (w != null && w.weaponData == this)
+            Debug.LogWarning("모든 무기 슬롯이 가득 찼습니다.");
+            return;
+        }
+
+        // 중복 장착 방지
+        foreach (WeaponShooter shooter in equippedWeapons)
+        {
+            if (shooter != null && shooter.weaponData == this)
             {
                 Debug.LogWarning($"{itemName}은(는) 이미 장착되어 있습니다.");
                 return;
             }
         }
 
+        // 무기 생성 및 설정
         GameObject weaponObj = new GameObject(itemName);
-        weaponObj.transform.SetParent(player.transform);
+        weaponObj.transform.SetParent(emptySlot);
+        weaponObj.transform.localPosition = Vector3.zero;
 
-        WeaponOrbit weaponOrbit = weaponObj.AddComponent<WeaponOrbit>();
-        weaponOrbit.player = player.transform;
-        weaponOrbit.weaponData = this;
+        WeaponShooter newShooter = weaponObj.AddComponent<WeaponShooter>();
+        newShooter.player = player.transform;
+        newShooter.weaponData = this;
 
-        equippedWeapons.Add(weaponOrbit);
-        UpdateWeaponOffsets(player.transform);
+        SpriteRenderer spriteRenderer = weaponObj.AddComponent<SpriteRenderer>();
+        spriteRenderer.sprite = itemSprite;
+        spriteRenderer.sortingOrder = 5;
 
-        Debug.Log($"{itemName} 장착 완료! (현재 {equippedWeapons.Count}/6)");
-    }
-
-    private void UpdateWeaponOffsets(Transform player)
-    {
-        int count = equippedWeapons.Count;
-        float angleStep = 360f / count;
-
-        for (int i = 0; i < count; i++)
-        {
-            if (equippedWeapons[i] == null) continue;
-
-            float angle = angleStep * i * Mathf.Deg2Rad;
-            float radius = 1.5f;
-            Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * radius;
-
-            equippedWeapons[i].offset = offset;
-        }
+        equippedWeapons.Add(newShooter);
+        Debug.Log($"{itemName} 장착 완료 ({slotManager.GetCurrentWeaponCount()}/6)");
     }
 }

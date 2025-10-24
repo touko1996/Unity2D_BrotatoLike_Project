@@ -1,27 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+// 플레이어 숨쉬기 및 이동 애니메이션
 public class PlayerAnimation : MonoBehaviour
 {
-    [Header("설정")]
-    [SerializeField] private float scaleAmount = 0.05f; //늘어나는 정도
-    [SerializeField] private float speed = 8f; // 숨쉬는 속도
-    [SerializeField] private bool isRunning = false; //기본을 false로 두고 달릴 때 true로 전환
+    [Header("애니메이션 설정")]
+    [SerializeField] private float scaleAmount = 0.05f; // 크기 변화 폭
+    [SerializeField] private float speed = 8f;          // 기본 숨쉬기 속도
+    [SerializeField] private bool isRunning = false;    // 이동 중 여부
 
-    private Vector3 originScale;
+    private Vector3 _originalScale;
 
     private void Start()
     {
-        originScale = transform.localScale;
-       
+        _originalScale = transform.localScale;
     }
+
     private void Update()
     {
+        // 이동 중이면 숨쉬기 속도 2배
         float currentSpeed = isRunning ? speed * 2f : speed;
-        float newY = originScale.y + Mathf.Sin(Time.time * currentSpeed)*scaleAmount;
-        transform.localScale = new Vector3(originScale.x, newY, originScale.z);
+        float newY = _originalScale.y + Mathf.Sin(Time.time * currentSpeed) * scaleAmount;
+
+        transform.localScale = new Vector3(_originalScale.x, newY, _originalScale.z);
     }
+
+    // 외부에서 이동 여부를 전달받음
     public void SetRunning(bool running)
     {
         isRunning = running;

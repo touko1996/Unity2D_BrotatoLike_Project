@@ -1,75 +1,63 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+// 기본 몬스터 이동 및 체력 처리
 public class Monster : MonoBehaviour
 {
     [Header("스탯 설정")]
-    public float speed = 2f;
+    public float moveSpeed = 2f;
     public float hp = 30f;
 
-    private Transform player;
-    private Rigidbody2D rb;
-    private SpriteRenderer sr;
+    private Transform _player;
+    private Rigidbody2D _rigidbody2D;
+    private SpriteRenderer _spriteRenderer;
 
-    void Awake()
+    private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>(); // 플립용
-        if (rb != null)
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (_rigidbody2D != null)
         {
-            rb.gravityScale = 0;
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            _rigidbody2D.gravityScale = 0;
+            _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
     }
 
-    void Start()
+    private void Start()
     {
-        player = GameObject.FindWithTag("Player")?.transform;
+        _player = GameObject.FindWithTag("Player")?.transform;
     }
 
-    void Update()
+    private void Update()
     {
-        if (player == null) return;
+        if (_player == null) return;
 
         // 플레이어 방향 계산
-        Vector2 dir = (player.position - transform.position).normalized;
+        Vector2 direction = (_player.position - transform.position).normalized;
 
-        // 이동
-        if (rb != null)
-        {
-            rb.MovePosition(rb.position + dir * speed * Time.deltaTime);
-        }
+        // 이동 처리
+        if (_rigidbody2D != null)
+            _rigidbody2D.MovePosition(_rigidbody2D.position + direction * moveSpeed * Time.deltaTime);
         else
-        {
-            transform.position += (Vector3)dir * speed * Time.deltaTime;
-        }
+            transform.position += (Vector3)direction * moveSpeed * Time.deltaTime;
 
-        // --- 좌우 방향에 따라 플립 적용 ---
-        if (player.position.x > transform.position.x)
-        {
-            sr.flipX = false; // 플레이어가 오른쪽에 있음
-        }
-        else if (player.position.x < transform.position.x)
-        {
-            sr.flipX = true;  // 플레이어가 왼쪽에 있음
-        }
+        // 좌우 방향에 따라 스프라이트 반전
+        _spriteRenderer.flipX = _player.position.x < transform.position.x;
     }
 
-    public void TakeDamage(float dmg)
+    // 데미지 처리
+    public void ReceiveDamage(float damage)
     {
-        hp -= dmg;
+        hp -= damage;
         if (hp <= 0)
-        {
             Destroy(gameObject);
-        }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            // 체력 감소 같은 로직을 나중에 추가할 수 있음
+            // 플레이어 충돌 시 로직 (추후 구현)
         }
     }
 }

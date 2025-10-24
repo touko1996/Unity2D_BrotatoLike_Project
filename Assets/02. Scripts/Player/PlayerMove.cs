@@ -1,44 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+// 플레이어 이동 및 방향 전환
 public class PlayerMove : MonoBehaviour
 {
-    [Header("플레이어 이동설정")]
+    [Header("이동 설정")]
     [SerializeField] private float moveSpeed = 5.0f;
 
-    private Rigidbody2D playerRb;
-    private Vector2 moveInput;
-    private SpriteRenderer sr; // 플립용 스프라이트 렌더러
+    private Rigidbody2D _rigidbody2D;
+    private Vector2 _moveInput;
+    private SpriteRenderer _spriteRenderer;
+    private PlayerAnimation _playerAnimation;
 
     private void Awake()
     {
-        playerRb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>(); // 스프라이트 렌더러 참조
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _playerAnimation = GetComponent<PlayerAnimation>();
     }
 
-    void Update()
+    private void Update()
     {
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
-        moveInput.Normalize();
+        // 이동 입력
+        _moveInput.x = Input.GetAxisRaw("Horizontal");
+        _moveInput.y = Input.GetAxisRaw("Vertical");
+        _moveInput.Normalize();
 
-        // --- 좌우 이동시 플립 처리 ---
-        if (moveInput.x > 0)
-        {
-            sr.flipX = false;
-        }
-        else if (moveInput.x < 0)
-        {
-            sr.flipX = true;
-        }
+        // 좌우 방향에 따라 스프라이트 플립
+        if (_moveInput.x > 0)
+            _spriteRenderer.flipX = false;
+        else if (_moveInput.x < 0)
+            _spriteRenderer.flipX = true;
 
-        bool isMoving = Mathf.Abs(moveInput.x) > 0.1f || Mathf.Abs(moveInput.y) > 0.1f;
-        GetComponent<PlayerAnimation>().SetRunning(isMoving);
+        // 이동 중인지 판별
+        bool isMoving = Mathf.Abs(_moveInput.x) > 0.1f || Mathf.Abs(_moveInput.y) > 0.1f;
+        _playerAnimation.SetRunning(isMoving);
     }
 
     private void FixedUpdate()
     {
-        playerRb.MovePosition(playerRb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        // 실제 이동 처리 (프레임 독립적)
+        _rigidbody2D.MovePosition(_rigidbody2D.position + _moveInput * moveSpeed * Time.fixedDeltaTime);
     }
 }
