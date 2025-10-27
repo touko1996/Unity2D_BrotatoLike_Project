@@ -25,7 +25,11 @@ public class Monster : MonoBehaviour
 
     private void Start()
     {
-        _player = GameObject.FindWithTag("Player")?.transform;
+        GameObject playerObj = GameObject.FindWithTag("Player");
+        if (playerObj != null)
+        {
+            _player = playerObj.transform;
+        }
     }
 
     private void Update()
