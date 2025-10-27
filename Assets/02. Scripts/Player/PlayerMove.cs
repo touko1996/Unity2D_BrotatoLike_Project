@@ -2,21 +2,18 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    [Header("참조")]
-    [SerializeField] private Rigidbody2D _rigidbody2D;
-    [SerializeField] private PlayerStats _playerStats;
+    
+    private Rigidbody2D _rigidbody2D;
+    private PlayerStats _playerStats;
+    private SpriteRenderer _spriteRenderer;
 
     private Vector2 _moveInput;
 
     void Awake()
     {
-        // Rigidbody2D 자동 할당
-        if (_rigidbody2D == null)
-            _rigidbody2D = GetComponent<Rigidbody2D>();
-
-        // PlayerStats 자동 할당
-        if (_playerStats == null)
-            _playerStats = GetComponent<PlayerStats>();
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _playerStats = GetComponent<PlayerStats>();
     }
 
     void Update()
@@ -25,6 +22,9 @@ public class PlayerMove : MonoBehaviour
         _moveInput.x = Input.GetAxisRaw("Horizontal");
         _moveInput.y = Input.GetAxisRaw("Vertical");
         _moveInput.Normalize();
+        if(_moveInput.x > 0) _spriteRenderer.flipX = false;
+        else if (_moveInput.x < 0) _spriteRenderer.flipX = true;
+
     }
 
     void FixedUpdate()
@@ -35,8 +35,6 @@ public class PlayerMove : MonoBehaviour
         float currentSpeed = _playerStats.currentMoveSpeed;
 
         // Rigidbody 이동
-        _rigidbody2D.MovePosition(
-            _rigidbody2D.position + _moveInput * currentSpeed * Time.fixedDeltaTime
-        );
+        _rigidbody2D.MovePosition(_rigidbody2D.position + _moveInput * currentSpeed * Time.fixedDeltaTime);
     }
 }

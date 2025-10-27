@@ -4,7 +4,7 @@ using UnityEngine;
 public class MonsterAnimation : MonoBehaviour
 {
     [Header("크기 변화 설정")]
-    [SerializeField] private float scaleAmount = 0.05f; //크기 변화폭
+    [SerializeField] private float scaleAmount = 0.03f; //크기 변화폭
     [SerializeField] private float speed = 8f; //변하는 속도
 
     private Vector3 _originalScale;
