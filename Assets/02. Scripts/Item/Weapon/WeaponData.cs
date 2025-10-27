@@ -1,63 +1,51 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-// 무기 정보 (ScriptableObject)
-[CreateAssetMenu(fileName = "NewWeaponData", menuName = "Items/WeaponData")]
+// 무기 데이터 ScriptableObject
+[CreateAssetMenu(fileName = "NewWeapon", menuName = "Items/Weapon")]
 public class WeaponData : Item
 {
     [Header("무기 정보")]
-    public GameObject projectilePrefab;
-    public float damage = 10f;
-    public float fireRate = 1f;
-    public float projectileSpeed = 10f;
-    public float detectionRange = 8f;
-
-    private static List<WeaponShooter> equippedWeapons = new List<WeaponShooter>();
+    public float damage = 10f;          // 무기 공격력
+    public float fireRate = 1f;         // 초당 발사 속도
+    public float detectionRange = 5f;   // 적 탐지 범위
+    public float projectileSpeed = 10f; // 투사체 속도
+    public GameObject projectilePrefab; // 투사체 프리팹
 
     public override void ApplyEffect(GameObject player)
     {
-        WeaponSlotManager slotManager = player.GetComponent<WeaponSlotManager>();
-        if (slotManager == null)
-        {
-            Debug.LogError("WeaponSlotManager가 없습니다. Player에 추가하세요.");
-            return;
-        }
+        // WeaponSlotManager를 통해 비어있는 슬롯 찾기
+        WeaponSlotManager slotManager = FindObjectOfType<WeaponSlotManager>();
+        Transform emptySlot = slotManager != null ? slotManager.GetEmptySlot() : null;
 
-        Transform emptySlot = slotManager.GetEmptySlot();
         if (emptySlot == null)
         {
-            Debug.LogWarning("모든 무기 슬롯이 가득 찼습니다.");
+            Debug.LogWarning("WeaponData ApplyEffect - No empty slot available for " + itemName);
             return;
         }
 
-        // 중복 장착 방지
-        foreach (WeaponShooter shooter in equippedWeapons)
-        {
-            if (shooter != null && shooter.weaponData == this)
-            {
-                Debug.LogWarning(itemName + "은(는) 이미 장착되어 있습니다.");
-                return;
-            }
-        }
-
-        // 무기 오브젝트 생성 및 슬롯에 배치
+        // 무기 오브젝트 생성
         GameObject weaponObj = new GameObject(itemName);
-        weaponObj.transform.SetParent(emptySlot);
-        weaponObj.transform.localPosition = Vector3.zero;
+        weaponObj.transform.SetParent(emptySlot, false);
 
-        // 무기 컴포넌트 설정
+        // 스프라이트 렌더러 추가 및 itemSprite 적용
+        SpriteRenderer sr = weaponObj.GetComponent<SpriteRenderer>();
+        if (sr == null)
+            sr = weaponObj.AddComponent<SpriteRenderer>();
+
+        if (itemSprite != null)
+            sr.sprite = itemSprite;
+        else
+            Debug.LogWarning("WeaponData ApplyEffect - itemSprite not assigned for " + itemName);
+
+        // WeaponShooter 컴포넌트 추가 및 설정
         WeaponShooter newShooter = weaponObj.AddComponent<WeaponShooter>();
-
-        // 핵심 수정 부분: WeaponRoot가 아닌 Player 본체를 참조하도록 변경
-        newShooter.player = player.transform.root;
         newShooter.weaponData = this;
 
-        // 스프라이트 추가
-        SpriteRenderer spriteRenderer = weaponObj.AddComponent<SpriteRenderer>();
-        spriteRenderer.sprite = itemSprite;
-        spriteRenderer.sortingOrder = 5;
+        Debug.Log("WeaponData ApplyEffect - Weapon applied: " + itemName);
+    }
 
-        equippedWeapons.Add(newShooter);
-        Debug.Log(itemName + " 장착 완료 (" + slotManager.GetCurrentWeaponCount() + "/6)");
+    public override void RemoveEffect(GameObject player)
+    {
+        Debug.Log("WeaponData RemoveEffect - " + itemName + " removed from player.");
     }
 }

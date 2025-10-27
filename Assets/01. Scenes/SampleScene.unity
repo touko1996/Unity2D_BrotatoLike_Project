@@ -423,7 +423,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slotDistance: 1.5
+  slotCount: 6
   player: {fileID: 1809574825}
+  _weaponSlots: []
 --- !u!4 &1711087860
 Transform:
   m_ObjectHideFlags: 0
@@ -653,14 +655,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bc3bc5a9982d6540925f5f477c8fa1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseDamage: 10
-  baseRange: 5
-  baseAttackSpeed: 1
-  baseMoveSpeed: 5
-  currentDamage: 0
-  currentRange: 0
-  currentAttackSpeed: 0
-  currentMoveSpeed: 0
+  currentDamage: 10
+  currentRange: 5
+  currentAttackSpeed: 1
+  currentMoveSpeed: 5
 --- !u!1 &1931624231
 GameObject:
   m_ObjectHideFlags: 0

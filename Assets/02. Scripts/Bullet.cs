@@ -4,7 +4,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public float lifetime = 2f;
-    public float damage = 10f;
+    [HideInInspector] public float damage;
 
     private void Start()
     {
