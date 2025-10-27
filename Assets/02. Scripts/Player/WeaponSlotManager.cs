@@ -31,7 +31,7 @@ public class WeaponSlotManager : MonoBehaviour
         for (int i = 0; i < slotCount; i++)
         {
             GameObject slot = new GameObject($"WeaponSlot_{i + 1}");
-            slot.transform.SetParent(transform, false);
+            slot.transform.SetParent(transform, false); //월드좌표 유지여부가 false, 즉 로컬기준으로 부모오브젝트를 두고 새롭게 좌표를 계산해라
             _weaponSlots.Add(slot.transform);
         }
 
@@ -57,8 +57,8 @@ public class WeaponSlotManager : MonoBehaviour
 
         for (int i = 0; i < _weaponSlots.Count; i++)
         {
-            float angle = (360f / _weaponSlots.Count) * i * Mathf.Deg2Rad;
-            Vector3 pos = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * slotDistance;
+            float angle = (360f / _weaponSlots.Count) * i * Mathf.Deg2Rad; //도를 라디안으로 바꾸는거, 그래야 아래에서 Mathf.Cos 나 Mathf.Sin으로 식 활용 가능
+            Vector3 pos = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * slotDistance; //Mathf.cos는 x축의 값을, Mathf.sin 은 y값을 도출
             _weaponSlots[i].localPosition = pos;
         }
     }
