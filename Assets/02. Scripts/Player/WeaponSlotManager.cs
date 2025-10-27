@@ -4,6 +4,8 @@ using UnityEngine;
 // 무기 슬롯을 생성하고 관리하는 매니저
 public class WeaponSlotManager : MonoBehaviour
 {
+    public static WeaponSlotManager Instance { get; private set; }
+
     [Header("무기 슬롯 설정")]
     [SerializeField] private float slotDistance = 1.5f; //플레이어를 기준으로 무기들이 도는 거리
     [SerializeField] private int slotCount = 6; //총 슬롯 개수
@@ -14,6 +16,17 @@ public class WeaponSlotManager : MonoBehaviour
 
     void Awake()
     {
+        // 싱글톤 초기화
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 유지
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         //무기 슬롯 생성
         for (int i = 0; i < slotCount; i++)
         {
@@ -85,5 +98,10 @@ public class WeaponSlotManager : MonoBehaviour
             }
         }
         return count;
+    }
+    // 외부에서 플레이어 할당
+    public void SetPlayer(Transform playerTransform)
+    {
+        player = playerTransform;
     }
 }
