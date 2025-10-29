@@ -6,6 +6,7 @@ public class Monster : MonoBehaviour
     [SerializeField] protected float hp = 50f;
     [SerializeField] protected float moveSpeed = 5f;
     [SerializeField] protected float contactDamage = 5f;
+    [SerializeField] private GameObject dropItemPrefab;
 
     protected Transform player;
     protected SpriteRenderer spriteRenderer;
@@ -41,10 +42,21 @@ public class Monster : MonoBehaviour
         if (hp <= 0)
             Die();
     }
-
+    public virtual void Heal(float amount)
+    {
+        hp += amount;
+        Debug.Log($"{gameObject.name} 회복됨 (+{amount}), 현재 HP: {hp}");
+    }
     protected virtual void Die()
     {
         Debug.Log($"{gameObject.name} 사망");
+
+        // 아이템 드롭
+        if (dropItemPrefab != null)
+        {
+            Instantiate(dropItemPrefab, transform.position, Quaternion.identity);
+        }
+
         gameObject.SetActive(false);
     }
 
