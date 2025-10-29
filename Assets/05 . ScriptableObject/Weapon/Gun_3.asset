@@ -16,8 +16,8 @@ MonoBehaviour:
   description: 
   itemSprite: {fileID: 21300000, guid: 824ae15d07b005f439521ee35c94f603, type: 3}
   price: 0
-  projectilePrefab: {fileID: 8912848321539613400, guid: c0f97ab3e987136469e3cf9674c949c5, type: 3}
   damage: 5
   fireRate: 1
+  detectionRange: 0
   projectileSpeed: 5
-  detectionRange: 8
+  projectilePrefab: {fileID: 8912848321539613400, guid: c0f97ab3e987136469e3cf9674c949c5, type: 3}
