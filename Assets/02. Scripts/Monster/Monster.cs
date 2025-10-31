@@ -64,8 +64,12 @@ public class Monster : MonoBehaviour
     {
         if (collision.collider.CompareTag("Player"))
         {
-            Debug.Log($"{gameObject.name}이(가) 플레이어에게 {contactDamage} 데미지!");
-            // 추후 PlayerStats.ReceiveDamage(contactDamage) 호출 예정
+            PlayerStats playerStats = collision.collider.GetComponent<PlayerStats>();
+            if (playerStats != null)
+            {
+                playerStats.TakeDamage(contactDamage);
+            }
         }
     }
+
 }

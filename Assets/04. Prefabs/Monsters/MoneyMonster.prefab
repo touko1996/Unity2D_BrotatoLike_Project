@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4169514691591747248}
   - component: {fileID: 2619010640459658970}
   - component: {fileID: 8548021839599482944}
+  - component: {fileID: 3108930143325629655}
   m_Layer: 8
   m_Name: MoneyMonster
   m_TagString: Monster
@@ -132,8 +133,6 @@ MonoBehaviour:
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
   minCoinDrop: 3
   maxCoinDrop: 7
-  wanderRadius: 5
-  changeDirectionTime: 3
   coinPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
   dropRadius: 2
 --- !u!58 &8548021839599482944
@@ -171,3 +170,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 4
+--- !u!114 &3108930143325629655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3793428111580498405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 733b3b01106391c49bb91fe98f5ffab8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 2
+  noiseSpeed: 0.6
+  noiseStrength: 1

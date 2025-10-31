@@ -113,7 +113,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!58 &960569474578404508
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -166,7 +166,7 @@ MonoBehaviour:
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
   stopRange: 4
-  projectileDamage: 10
+  attackRange: 5
   projectileSpeed: 8
   shootInterval: 2
-  projectilePrefab: {fileID: 8301433787073505185, guid: 523c121c378a7f342bf9920373091d64, type: 3}
+  projectilePrefab: {fileID: 9134859640723060283, guid: f885a768b932d624f8a6bccbc978d1ad, type: 3}

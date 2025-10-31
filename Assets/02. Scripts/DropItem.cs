@@ -2,25 +2,27 @@ using UnityEngine;
 
 public class DropItem : MonoBehaviour
 {
+    [Header("Reward Values")]
+    public int coinValue = 1;
+    public float expValue = 1f;
+
     private bool isCollected = false;
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (isCollected) return;
 
-        if (other.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
             isCollected = true;
-            PlayerStats playerStats = other.GetComponent<PlayerStats>();
-            if (playerStats != null)
+
+            PlayerInventory inventory = collision.GetComponent<PlayerInventory>();
+            if (inventory != null)
             {
-                PlayerInventory inventory = other.GetComponent<PlayerInventory>();
-                if (inventory != null)
-                    inventory.AddReward(1, 1); // 경험치 +1, 재화 +1
+                inventory.AddReward(coinValue, expValue);
             }
 
-            Debug.Log("아이템 획득! 경험치 +1, 재화 +1");
-            Destroy(gameObject); // 플레이어가 주웠을 때만 사라짐
+            Destroy(gameObject);
         }
     }
 }

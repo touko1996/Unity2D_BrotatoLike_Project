@@ -8,7 +8,10 @@ public class PlayerStats : MonoBehaviour
     public float currentAttackSpeed = 1f;
     public float currentMoveSpeed = 5f;
 
-    // 간단한 증감 메서드만 유지
+    [Header("HP")]
+    public float maxHp = 10f;
+    public float currentHp = 10f;
+
     public void AddStatModifier(float dmg, float range, float atkSpeed, float move)
     {
         currentDamage += dmg;
@@ -23,5 +26,28 @@ public class PlayerStats : MonoBehaviour
         currentRange -= range;
         currentAttackSpeed -= atkSpeed;
         currentMoveSpeed -= move;
+    }
+
+    public void TakeDamage(float amount)
+    {
+        currentHp -= amount;
+        if (currentHp < 0f) currentHp = 0f;
+
+        if (currentHp <= 0f)
+        {
+            Die();
+        }
+    }
+
+    public void Heal(float amount)
+    {
+        currentHp += amount;
+        if (currentHp > maxHp) currentHp = maxHp;
+    }
+
+    private void Die()
+    {
+        Debug.Log("Player died");
+        // 나중에 게임오버 UI 연결
     }
 }

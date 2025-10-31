@@ -169,7 +169,6 @@ MonoBehaviour:
   chargeRange: 5
   chargeSpeed: 30
   chargeDelay: 1
-  chargeDamage: 20
   chargeTime: 1.2
   chargeWarningColor: {r: 1, g: 0, b: 0, a: 1}
   flashSpeed: 8
