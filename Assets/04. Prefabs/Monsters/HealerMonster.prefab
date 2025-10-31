@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1688389392762405235}
   - component: {fileID: 8087671904014733930}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Outline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 2155944537055156513}
   - component: {fileID: 675045914925239873}
   - component: {fileID: 1747040144289574198}
+  - component: {fileID: 8484666032118698901}
   m_Layer: 8
   m_Name: HealerMonster
   m_TagString: Monster
@@ -251,8 +252,6 @@ MonoBehaviour:
   moveSpeed: 5
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
-  wanderRadius: 5
-  changeDirectionTime: 3
   fleeRange: 4
   fleeSpeed: 2
   healInterval: 4
@@ -272,3 +271,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scaleAmount: 0.03
   speed: 8
+--- !u!114 &8484666032118698901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6381437360406248548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 733b3b01106391c49bb91fe98f5ffab8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 2
+  noiseSpeed: 0.6
+  noiseStrength: 1
