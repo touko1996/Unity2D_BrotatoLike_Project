@@ -3,55 +3,82 @@ using UnityEngine;
 
 public class WeaponSlotManager : MonoBehaviour
 {
-    [Header("Weapon Slot Settings")]
+    [Header("슬롯 관련 설정")]
     [SerializeField] private float slotDistance = 1.5f;
-    [SerializeField] private Transform slotParent;
+    private List<Transform> _weaponSlots = new List<Transform>();
 
-    [Header("Starting Weapon")]
+    [Header("초기 무기 데이터 (원본 SO)")]
     [SerializeField] private WeaponData startingWeapon;
 
-    private List<Transform> _weaponSlots = new List<Transform>();
-    private PlayerInventory inventory;
-
-    // ★ 플레이어 위치 추적용
-    private Transform playerTransform;
+    private Transform player;
 
     private void Awake()
     {
-        int slotCount = 6;
-        for (int i = 0; i < slotCount; i++)
+        // 슬롯 생성
+        for (int i = 0; i < 6; i++)
         {
             GameObject slot = new GameObject("WeaponSlot_" + (i + 1));
-            slot.transform.SetParent(slotParent != null ? slotParent : transform, false);
+            slot.transform.SetParent(transform, false);
             _weaponSlots.Add(slot.transform);
         }
+
+        UpdateSlotPositions();
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.transform;
     }
 
     private void Start()
     {
-        inventory = FindObjectOfType<PlayerInventory>();
-        ArrangeSlots();
-
-        // ★ 플레이어 Transform 캐싱
-        playerTransform = GameObject.FindWithTag("Player")?.transform;
-
-        // ★ 시작 무기 장착
         if (startingWeapon != null)
         {
-            EquipWeapon(startingWeapon);
-        }
-    }
+            // ★ 복제본 생성 ★
+            WeaponData clone = ScriptableObject.Instantiate(startingWeapon);
+            clone.name = startingWeapon.name + "_Clone";
 
-    private void Update()
-    {
-        // ★ 플레이어 위치를 따라가게 (숨쉬기모션은 제외)
-        if (playerTransform != null)
+            // 슬롯에 장착
+            Transform emptySlot = GetEmptySlot();
+            if (emptySlot != null)
+            {
+                GameObject weaponObj = new GameObject(clone.itemName);
+                weaponObj.transform.SetParent(emptySlot, false);
+
+                SpriteRenderer sr = weaponObj.AddComponent<SpriteRenderer>();
+                if (clone.itemSprite != null)
+                    sr.sprite = clone.itemSprite;
+
+                WeaponShooter shooter = weaponObj.AddComponent<WeaponShooter>();
+                shooter.weaponData = clone;
+
+                // 인벤토리에 복제본 등록
+                PlayerInventory inv = FindObjectOfType<PlayerInventory>();
+                if (inv != null && !inv.GetOwnedWeapons().Exists(w => w.itemName == clone.itemName))
+                {
+                    inv.ownedItems.Add(clone);
+                    inv.OnInventoryChanged?.Invoke();
+                }
+
+                Debug.Log("[WeaponSlotManager] 초기 무기 복제본 장착 완료: " + clone.itemName);
+            }
+            else
+            {
+                Debug.LogWarning("[WeaponSlotManager] 비어있는 슬롯 없음, 초기무기 장착 실패");
+            }
+        }
+        else
         {
-            transform.position = playerTransform.position;
+            Debug.LogWarning("[WeaponSlotManager] startingWeapon이 비어 있음");
         }
     }
 
-    private void ArrangeSlots()
+    private void LateUpdate()
+    {
+        if (player != null)
+            transform.position = player.position;
+    }
+
+    private void UpdateSlotPositions()
     {
         for (int i = 0; i < _weaponSlots.Count; i++)
         {
@@ -71,34 +98,36 @@ public class WeaponSlotManager : MonoBehaviour
         return null;
     }
 
-    public void EquipWeapon(WeaponData weaponData)
+    public int GetEquippedWeaponCount()
     {
-        if (weaponData == null)
-            return;
-
-        Transform emptySlot = GetEmptySlot();
-        if (emptySlot == null)
+        int count = 0;
+        foreach (Transform slot in _weaponSlots)
         {
-            Debug.LogWarning("No empty weapon slot available!");
-            return;
+            if (slot.childCount > 0)
+                count++;
+        }
+        return count;
+    }
+
+    public bool RemoveSingleWeaponByName(string weaponName)
+    {
+        foreach (Transform slot in _weaponSlots)
+        {
+            if (slot.childCount > 0)
+            {
+                Transform child = slot.GetChild(0);
+                string name = child.name.Replace("(Clone)", "").Trim();
+
+                if (name == weaponName)
+                {
+                    GameObject.Destroy(child.gameObject);
+                    Debug.Log("[WeaponSlotManager] 무기 제거: " + weaponName);
+                    return true;
+                }
+            }
         }
 
-        GameObject weaponObj = new GameObject(weaponData.itemName);
-        weaponObj.transform.SetParent(emptySlot, false);
-
-        SpriteRenderer sr = weaponObj.AddComponent<SpriteRenderer>();
-        if (weaponData.itemSprite != null)
-            sr.sprite = weaponData.itemSprite;
-
-        WeaponShooter shooter = weaponObj.AddComponent<WeaponShooter>();
-        shooter.weaponData = weaponData;
-
-        if (inventory != null && !inventory.ownedItems.Contains(weaponData))
-        {
-            inventory.ownedItems.Add(weaponData);
-            inventory.OnInventoryChanged?.Invoke();
-        }
-
-        Debug.Log($"Equipped weapon: {weaponData.itemName}");
+        Debug.LogWarning("[WeaponSlotManager] 무기 제거 실패: " + weaponName);
+        return false;
     }
 }

@@ -7816,7 +7816,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31184937abbc2ee42935809605594cf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iconPrefab: {fileID: 5453640007034515713, guid: 1b5e4f6a37777c945b8f4d8ced6915ab, type: 3}
+  iconPrefab: {fileID: 1135596129774926071, guid: 299096663788c0144b1b307603865fcf, type: 3}
   container: {fileID: 1881840220}
 --- !u!1 &1494336290
 GameObject:
@@ -8869,7 +8869,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1711087860}
-  - component: {fileID: 1711087859}
+  - component: {fileID: 1711087861}
   m_Layer: 0
   m_Name: PlayerWeaponSlots
   m_TagString: Untagged
@@ -8877,21 +8877,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1711087859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1711087858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0714c061e16d7c449b7e6f5047a8a2be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slotDistance: 1.5
-  slotParent: {fileID: 0}
-  startingWeapon: {fileID: 11400000, guid: ad1ffe1c051243b459e9d4e472c811fa, type: 2}
 --- !u!4 &1711087860
 Transform:
   m_ObjectHideFlags: 0
@@ -8907,6 +8892,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1711087861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1711087858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0714c061e16d7c449b7e6f5047a8a2be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotDistance: 1.5
+  startingWeapon: {fileID: 11400000, guid: ad1ffe1c051243b459e9d4e472c811fa, type: 2}
 --- !u!1 &1756376392
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,33 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [Header("Player EXP Settings")]
+    [Header("경험치 및 골드 관련")]
     public int level = 0;
     public float currentExp = 0f;
     public float expToNextLevel = 16f;
-
-    [Header("Player Gold")]
     public int gold = 0;
-
-    [Header("Wave LevelUp Counter")]
     public int waveLevelUpCount = 0;
 
-    [Header("Inventory Lists")]
-    public List<Item> ownedItems = new List<Item>(); // 무기 + 패시브 통합 리스트
+    [Header("보유 아이템 리스트 (복제본만 저장)")]
+    public List<Item> ownedItems = new List<Item>();
 
     [SerializeField] private UI_PlayerStatus uiPlayerStatus;
-
-    // -------------------------------
-    // 인벤토리 변경 이벤트 (UI 갱신용)
-    // -------------------------------
     public Action OnInventoryChanged;
 
-    // -------------------------------
-    // 경험치 & 골드 처리
-    // -------------------------------
+    // ---------------------------------------------------------
+    // 경험치 및 보상
+    // ---------------------------------------------------------
     public void AddReward(int coin, float exp)
     {
         gold += coin;
@@ -57,68 +50,125 @@ public class PlayerInventory : MonoBehaviour
         waveLevelUpCount = 0;
     }
 
-    // -------------------------------
-    // 상점 관련 기능
-    // -------------------------------
+    // ---------------------------------------------------------
+    // 아이템 구매 (복제본만 저장, 원본 SO 절대 수정 안 함)
+    // ---------------------------------------------------------
     public void BuyItem(Item item)
     {
         if (item == null || gold < item.price) return;
 
+        WeaponData weapon = item as WeaponData;
+        if (weapon != null)
+        {
+            WeaponSlotManager slotManager = FindObjectOfType<WeaponSlotManager>();
+            if (slotManager == null)
+            {
+                Debug.LogWarning("[BuyItem] WeaponSlotManager를 찾을 수 없음");
+                return;
+            }
+
+            // 동일 이름 무기 복제본 검색
+            WeaponData sameWeapon = ownedItems
+                .OfType<WeaponData>()
+                .FirstOrDefault(w => w.itemName == weapon.itemName);
+
+            // 동일 무기가 이미 있다면 -> 그 복제본을 티어업
+            if (sameWeapon != null)
+            {
+                sameWeapon.tier++;
+                sameWeapon.damage *= 1.2f;
+                sameWeapon.fireRate *= 1.1f;
+                sameWeapon.detectionRange += 1f;
+                sameWeapon.projectileSpeed *= 1.05f;
+
+                gold -= weapon.price;
+                uiPlayerStatus?.UpdateCoinUI(gold);
+                OnInventoryChanged?.Invoke();
+
+                Debug.Log("[BuyItem] 동일 무기 발견 → 복제본 티어업 (" + sameWeapon.itemName + " Tier " + sameWeapon.tier + ")");
+                return;
+            }
+
+            // 슬롯이 가득 찼으면 구매 불가
+            int equippedCount = slotManager.GetEquippedWeaponCount();
+            if (equippedCount >= 6)
+            {
+                Debug.Log("[BuyItem] 슬롯이 가득 차서 무기를 더 구매할 수 없음");
+                return;
+            }
+
+            // 완전히 새로운 무기 -> 복제본 생성 후 사용
+            WeaponData clone = ScriptableObject.Instantiate(weapon);
+            clone.name = weapon.name + "_Clone";
+
+            gold -= weapon.price;
+            ownedItems.Add(clone);
+            clone.ApplyEffect(gameObject);
+
+            uiPlayerStatus?.UpdateCoinUI(gold);
+            OnInventoryChanged?.Invoke();
+
+            Debug.Log("[BuyItem] 복제본 무기 추가: " + clone.itemName);
+            return;
+        }
+
+        // 패시브 아이템
         gold -= item.price;
-        ownedItems.Add(item);
-        item.ApplyEffect(gameObject);
+        Item cloneItem = ScriptableObject.Instantiate(item);
+        cloneItem.name = item.name + "_Clone";
+
+        ownedItems.Add(cloneItem);
+        cloneItem.ApplyEffect(gameObject);
 
         uiPlayerStatus?.UpdateCoinUI(gold);
-
-        // ★ 인벤토리 변경 이벤트 실행
         OnInventoryChanged?.Invoke();
+
+        Debug.Log("[BuyItem] 패시브 아이템 추가 (복제본): " + cloneItem.itemName);
     }
 
+    // ---------------------------------------------------------
+    // 환불 (복제본 기준 동일하게 작동)
+    // ---------------------------------------------------------
     public void RefundItem(Item item)
     {
         if (!ownedItems.Contains(item)) return;
 
-        item.RefundAtStore(gameObject);
+        WeaponData weaponData = item as WeaponData;
+        if (weaponData != null)
+        {
+            WeaponSlotManager slotManager = FindObjectOfType<WeaponSlotManager>();
+            if (slotManager != null)
+            {
+                slotManager.RemoveSingleWeaponByName(weaponData.itemName);
+            }
+        }
+
+        for (int i = 0; i < ownedItems.Count; i++)
+        {
+            if (ownedItems[i].itemName == item.itemName)
+            {
+                ownedItems.RemoveAt(i);
+                break;
+            }
+        }
+
         gold += item.price / 2;
-        ownedItems.Remove(item);
-
         uiPlayerStatus?.UpdateCoinUI(gold);
-
-        // ★ 인벤토리 변경 이벤트 실행
         OnInventoryChanged?.Invoke();
+
+        Debug.Log("[Refund] 복제본 환불 완료: " + item.itemName);
     }
 
-    public void MixItem(Item item)
-    {
-        if (!ownedItems.Contains(item)) return;
-        item.MixAtStore(gameObject);
-
-        // ★ 합성 후에도 UI 갱신 필요 시
-        OnInventoryChanged?.Invoke();
-    }
-
-    // -------------------------------
-    // UI 표시용 헬퍼
-    // -------------------------------
+    // ---------------------------------------------------------
+    // 리스트 반환
+    // ---------------------------------------------------------
     public List<WeaponData> GetOwnedWeapons()
     {
-        List<WeaponData> weapons = new List<WeaponData>();
-        foreach (var item in ownedItems)
-        {
-            if (item is WeaponData weapon)
-                weapons.Add(weapon);
-        }
-        return weapons;
+        return ownedItems.OfType<WeaponData>().ToList();
     }
 
     public List<PassiveItem> GetOwnedPassives()
     {
-        List<PassiveItem> passives = new List<PassiveItem>();
-        foreach (var item in ownedItems)
-        {
-            if (item is PassiveItem passive)
-                passives.Add(passive);
-        }
-        return passives;
+        return ownedItems.OfType<PassiveItem>().ToList();
     }
 }
