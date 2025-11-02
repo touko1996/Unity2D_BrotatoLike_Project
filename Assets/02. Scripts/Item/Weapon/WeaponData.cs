@@ -1,51 +1,48 @@
 using UnityEngine;
 
-// 무기 데이터 ScriptableObject
 [CreateAssetMenu(fileName = "NewWeapon", menuName = "Items/Weapon")]
 public class WeaponData : Item
 {
-    [Header("무기 정보")]
-    public float damage = 10f;          // 무기 공격력
-    public float fireRate = 1f;         // 초당 발사 속도
-    public float detectionRange = 5f;   // 적 탐지 범위
-    public float projectileSpeed = 10f; // 투사체 속도
-    public GameObject projectilePrefab; // 투사체 프리팹
+    [Header("Weapon Stats")]
+    public float damage = 10f;
+    public float fireRate = 1f;
+    public float detectionRange = 5f;
+    public float projectileSpeed = 10f;
+    public int tier = 1;
+    public GameObject projectilePrefab;
 
     public override void ApplyEffect(GameObject player)
     {
-        // WeaponSlotManager를 통해 비어있는 슬롯 찾기
-        WeaponSlotManager slotManager = FindObjectOfType<WeaponSlotManager>();
-        Transform emptySlot = slotManager != null ? slotManager.GetEmptySlot() : null;
+        WeaponSlotManager slotManager = Object.FindObjectOfType<WeaponSlotManager>();
+        if (slotManager == null) return;
 
+        Transform emptySlot = slotManager.GetEmptySlot();
         if (emptySlot == null)
         {
-            Debug.LogWarning("WeaponData ApplyEffect - No empty slot available for " + itemName);
+            Debug.LogWarning("[WeaponData] 슬롯이 가득 참");
             return;
         }
 
-        // 무기 오브젝트 생성
         GameObject weaponObj = new GameObject(itemName);
         weaponObj.transform.SetParent(emptySlot, false);
 
-        // 스프라이트 렌더러 추가 및 itemSprite 적용
-        SpriteRenderer sr = weaponObj.GetComponent<SpriteRenderer>();
-        if (sr == null)
-            sr = weaponObj.AddComponent<SpriteRenderer>();
-
+        SpriteRenderer sr = weaponObj.AddComponent<SpriteRenderer>();
         if (itemSprite != null)
             sr.sprite = itemSprite;
-        else
-            Debug.LogWarning("WeaponData ApplyEffect - itemSprite not assigned for " + itemName);
 
-        // WeaponShooter 컴포넌트 추가 및 설정
-        WeaponShooter newShooter = weaponObj.AddComponent<WeaponShooter>();
-        newShooter.weaponData = this;
+        WeaponShooter shooter = weaponObj.AddComponent<WeaponShooter>();
+        shooter.weaponData = this;
 
-        Debug.Log("WeaponData ApplyEffect - Weapon applied: " + itemName);
+        Debug.Log("[WeaponData] 장착 완료: " + itemName);
     }
 
-    public override void RemoveEffect(GameObject player)
+    // Mix 시 스탯 업
+    public void MixUpgrade()
     {
-        Debug.Log("WeaponData RemoveEffect - " + itemName + " removed from player.");
+        tier++;
+        damage *= 1.3f;
+        fireRate *= 1.1f;
+        detectionRange += 1f;
+        Debug.Log("[MixUpgrade] " + itemName + "이 Tier " + tier + "로 강화됨");
     }
 }

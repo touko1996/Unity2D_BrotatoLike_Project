@@ -22,15 +22,20 @@ public class UI_Shop : MonoBehaviour
     {
         if (playerInventory == null)
             playerInventory = FindObjectOfType<PlayerInventory>();
-        if (shopManager == null)
-            shopManager = FindObjectOfType<UI_ShopManager>();
 
         coinText.text = "Coin: " + playerInventory.gold;
 
+        // Refresh passive list
         UI_PassiveList passiveList = FindObjectOfType<UI_PassiveList>();
         if (passiveList != null)
             passiveList.RefreshList();
+
+        // Refresh weapon list (important)
+        UI_WeaponList weaponList = FindObjectOfType<UI_WeaponList>();
+        if (weaponList != null)
+            weaponList.RefreshList();
     }
+
 
     private void Start()
     {
