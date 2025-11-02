@@ -1,107 +1,104 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// 무기 슬롯을 생성하고 관리하는 매니저
 public class WeaponSlotManager : MonoBehaviour
 {
-    public static WeaponSlotManager Instance { get; private set; }
+    [Header("Weapon Slot Settings")]
+    [SerializeField] private float slotDistance = 1.5f;
+    [SerializeField] private Transform slotParent;
 
-    [Header("무기 슬롯 설정")]
-    [SerializeField] private float slotDistance = 1.5f; //플레이어를 기준으로 무기들이 도는 거리
-    [SerializeField] private int slotCount = 6; //총 슬롯 개수
+    [Header("Starting Weapon")]
+    [SerializeField] private WeaponData startingWeapon;
 
-    [Header("참조")]
-    [SerializeField] private Transform player; //플레이어의 위치
-    [SerializeField] private List<Transform> _weaponSlots = new List<Transform>(); //무기 슬롯 목록
+    private List<Transform> _weaponSlots = new List<Transform>();
+    private PlayerInventory inventory;
 
-    void Awake()
+    // ★ 플레이어 위치 추적용
+    private Transform playerTransform;
+
+    private void Awake()
     {
-        // 싱글톤 초기화
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 유지
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        //무기 슬롯 생성
+        int slotCount = 6;
         for (int i = 0; i < slotCount; i++)
         {
-            GameObject slot = new GameObject("WeaponSlot_" + (i + 1)); //무기 슬롯 이름
-            slot.transform.SetParent(transform, false);
+            GameObject slot = new GameObject("WeaponSlot_" + (i + 1));
+            slot.transform.SetParent(slotParent != null ? slotParent : transform, false);
             _weaponSlots.Add(slot.transform);
         }
     }
 
-    void Update()
+    private void Start()
     {
-        //플레이어의 위치를 따라가게 설정
-        if (player != null)
-        {
-            transform.position = player.position;
-        }
+        inventory = FindObjectOfType<PlayerInventory>();
+        ArrangeSlots();
 
-        //슬롯 배치 갱신
-        UpdateSlotPositions();
+        // ★ 플레이어 Transform 캐싱
+        playerTransform = GameObject.FindWithTag("Player")?.transform;
+
+        // ★ 시작 무기 장착
+        if (startingWeapon != null)
+        {
+            EquipWeapon(startingWeapon);
+        }
     }
 
-    private void UpdateSlotPositions()
+    private void Update()
     {
-        //슬롯들을 원형 형태로 배치
+        // ★ 플레이어 위치를 따라가게 (숨쉬기모션은 제외)
+        if (playerTransform != null)
+        {
+            transform.position = playerTransform.position;
+        }
+    }
+
+    private void ArrangeSlots()
+    {
         for (int i = 0; i < _weaponSlots.Count; i++)
         {
-            float angle = (360f / _weaponSlots.Count) * i * Mathf.Deg2Rad; //각 슬롯의 회전 각도
+            float angle = (360f / _weaponSlots.Count) * i * Mathf.Deg2Rad;
             Vector3 pos = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * slotDistance;
             _weaponSlots[i].localPosition = pos;
         }
     }
 
-    // 비어있는 슬롯 반환
     public Transform GetEmptySlot()
     {
         foreach (Transform slot in _weaponSlots)
         {
             if (slot.childCount == 0)
-            {
                 return slot;
-            }
         }
-        Debug.Log("WeaponSlotManager - No Empty Slot Available");
         return null;
     }
 
-    // 슬롯 전체 비우기
-    public void ClearAllSlots()
+    public void EquipWeapon(WeaponData weaponData)
     {
-        foreach (Transform slot in _weaponSlots)
-        {
-            for (int i = 0; i < slot.childCount; i++)
-            {
-                Destroy(slot.GetChild(i).gameObject);
-            }
-        }
-        Debug.Log("WeaponSlotManager - All Slots Cleared");
-    }
+        if (weaponData == null)
+            return;
 
-    // 현재 장착된 무기 개수 반환
-    public int GetEquippedWeaponCount()
-    {
-        int count = 0;
-        foreach (Transform slot in _weaponSlots)
+        Transform emptySlot = GetEmptySlot();
+        if (emptySlot == null)
         {
-            if (slot.childCount > 0)
-            {
-                count++;
-            }
+            Debug.LogWarning("No empty weapon slot available!");
+            return;
         }
-        return count;
-    }
-    // 외부에서 플레이어 할당
-    public void SetPlayer(Transform playerTransform)
-    {
-        player = playerTransform;
+
+        GameObject weaponObj = new GameObject(weaponData.itemName);
+        weaponObj.transform.SetParent(emptySlot, false);
+
+        SpriteRenderer sr = weaponObj.AddComponent<SpriteRenderer>();
+        if (weaponData.itemSprite != null)
+            sr.sprite = weaponData.itemSprite;
+
+        WeaponShooter shooter = weaponObj.AddComponent<WeaponShooter>();
+        shooter.weaponData = weaponData;
+
+        if (inventory != null && !inventory.ownedItems.Contains(weaponData))
+        {
+            inventory.ownedItems.Add(weaponData);
+            inventory.OnInventoryChanged?.Invoke();
+        }
+
+        Debug.Log($"Equipped weapon: {weaponData.itemName}");
     }
 }
