@@ -4,93 +4,52 @@ using UnityEngine;
 [System.Serializable]
 public class Pool
 {
-    [Header("풀 개별 설정")]
-    public string poolName;          // 풀 이름 (식별용)
-    public GameObject prefab;        // 프리팹
-    public int poolSize = 10;        // 초기 생성 수
+    public string tag;
+    public GameObject prefab;
+    public int size;
 }
 
 public class SpawnPoolManager : MonoBehaviour
 {
-    public static SpawnPoolManager Instance { get; private set; }
-
-    [Header("풀 목록")]
-    public List<Pool> pools = new List<Pool>();
-
+    public List<Pool> pools;
     private Dictionary<string, Queue<GameObject>> poolDictionary;
 
     private void Awake()
-    {
-        // 싱글톤
-        if (Instance == null)
-            Instance = this;
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        InitializePools();
-    }
-
-    private void InitializePools()
     {
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
 
         foreach (Pool pool in pools)
         {
-            if (pool.prefab == null)
-            {
-                Debug.LogWarning($"풀 '{pool.poolName}'에 프리팹이 지정되지 않았습니다!");
-                continue;
-            }
-
             Queue<GameObject> objectPool = new Queue<GameObject>();
 
-            for (int i = 0; i < pool.poolSize; i++)
+            for (int i = 0; i < pool.size; i++)
             {
                 GameObject obj = Instantiate(pool.prefab);
                 obj.SetActive(false);
+                obj.transform.SetParent(transform);
                 objectPool.Enqueue(obj);
             }
 
-            poolDictionary.Add(pool.poolName, objectPool);
+            poolDictionary.Add(pool.tag, objectPool);
         }
-
-        Debug.Log($"SpawnPoolManager - {pools.Count}개의 풀 초기화 완료!");
     }
 
-    public GameObject SpawnFromPool(string poolName, Vector3 position, Quaternion rotation)
+    public GameObject SpawnFromPool(string tag, Vector3 position, Quaternion rotation)
     {
-        if (!poolDictionary.ContainsKey(poolName))
+        if (!poolDictionary.ContainsKey(tag))
         {
-            Debug.LogWarning($"'{poolName}' 풀을 찾을 수 없습니다!");
+            Debug.LogWarning($"[SpawnPoolManager] '{tag}' 풀 없음");
             return null;
         }
 
-        GameObject obj = null;
+        GameObject objectToSpawn = poolDictionary[tag].Dequeue();
 
-        // 비활성화된 오브젝트 찾기
-        Queue<GameObject> objectPool = poolDictionary[poolName];
+        objectToSpawn.SetActive(true);
+        objectToSpawn.transform.position = position;
+        objectToSpawn.transform.rotation = rotation;
 
-        if (objectPool.Count > 0 && !objectPool.Peek().activeInHierarchy)
-        {
-            obj = objectPool.Dequeue();
-        }
-        else
-        {
-            // 풀의 모든 오브젝트가 사용 중일 경우 새로 생성
-            Pool pool = pools.Find(p => p.poolName == poolName);
-            obj = Instantiate(pool.prefab);
-        }
+        poolDictionary[tag].Enqueue(objectToSpawn);
 
-        obj.transform.position = position;
-        obj.transform.rotation = rotation;
-        obj.SetActive(true);
-
-        // 다시 큐에 추가 (순환 구조 유지)
-        objectPool.Enqueue(obj);
-
-        return obj;
+        return objectToSpawn;
     }
 }
