@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -12,6 +13,19 @@ public class PlayerStats : MonoBehaviour
     public float maxHp = 10f;
     public float currentHp = 10f;
 
+    private bool isDead = false;
+    private UI_PlayerStatus uiStatus;
+
+    private void Start()
+    {
+        currentHp = maxHp;
+        uiStatus = FindObjectOfType<UI_PlayerStatus>();
+        UpdateHpUI();
+    }
+
+    // ---------------------------------------------
+    // 스탯 변화 (패시브 아이템용)
+    // ---------------------------------------------
     public void AddStatModifier(float dmg, float range, float atkSpeed, float move)
     {
         currentDamage += dmg;
@@ -28,10 +42,17 @@ public class PlayerStats : MonoBehaviour
         currentMoveSpeed -= move;
     }
 
+    // ---------------------------------------------
+    // 체력 변화
+    // ---------------------------------------------
     public void TakeDamage(float amount)
     {
+        if (isDead) return;
+
         currentHp -= amount;
         if (currentHp < 0f) currentHp = 0f;
+
+        UpdateHpUI();
 
         if (currentHp <= 0f)
         {
@@ -41,13 +62,54 @@ public class PlayerStats : MonoBehaviour
 
     public void Heal(float amount)
     {
+        if (isDead) return;
+
         currentHp += amount;
         if (currentHp > maxHp) currentHp = maxHp;
+        UpdateHpUI();
     }
 
+    // ---------------------------------------------
+    // 사망 처리
+    // ---------------------------------------------
     private void Die()
     {
-        Debug.Log("Player died");
-        // 나중에 게임오버 UI 연결
+        if (isDead)
+            return;
+
+        isDead = true;
+        Debug.Log("Die() called: Player HP reached 0");
+
+        // 웨이브 저장
+        UI_GameWave waveUI = FindObjectOfType<UI_GameWave>();
+        if (waveUI != null)
+        {
+            PlayerPrefsData.lastWave = waveUI.GetCurrentWave();
+            Debug.Log("Wave data saved: " + PlayerPrefsData.lastWave);
+        }
+
+        // 인벤토리 데이터 복제 저장
+        PlayerInventory inventory = GetComponent<PlayerInventory>();
+        if (inventory != null)
+        {
+            PlayerPrefsData.SaveFromInventory(inventory);
+            Debug.Log("Inventory data copied to PlayerPrefsData");
+        }
+
+        // GameOverScene 로드
+        SceneManager.LoadScene("GameOverScene");
+    }
+
+
+
+    // ---------------------------------------------
+    // HP UI 갱신
+    // ---------------------------------------------
+    private void UpdateHpUI()
+    {
+        if (uiStatus != null)
+        {
+            uiStatus.UpdateHPUI(currentHp, maxHp);
+        }
     }
 }

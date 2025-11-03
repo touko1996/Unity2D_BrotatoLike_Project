@@ -85,6 +85,10 @@ public class UI_GameWave : MonoBehaviour
 
         currentWave++;
     }
+    public int GetCurrentWave()
+    {
+        return currentWave;
+    }
 
 
 
