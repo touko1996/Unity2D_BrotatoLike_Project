@@ -1,57 +1,106 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+
+[System.Serializable]
+public class MonsterSpawnInfo
+{
+    public string monsterTag;       // 풀에서 찾을 이름 (ex: "NormalMonster")
+    public float spawnInterval;     // 개별 스폰 간격
+}
+
+[System.Serializable]
+public class WaveData
+{
+    public int waveNumber;
+    public List<MonsterSpawnInfo> monsters = new List<MonsterSpawnInfo>();
+}
 
 public class MonsterSpawner : MonoBehaviour
 {
-    [Header("스폰 설정")]
-    [SerializeField] private string[] monsterPoolNames; // SpawnPoolManager에 등록된 풀 이름들
-    [SerializeField] private float spawnInterval = 2f;  // 스폰 주기 (초)
-    [SerializeField] private int spawnCountPerWave = 1; // 한 번에 스폰할 몬스터 수
-    [SerializeField] private Vector2 spawnAreaMin;      // 스폰 영역 최소
-    [SerializeField] private Vector2 spawnAreaMax;      // 스폰 영역 최대
+    [Header("웨이브별 스폰 설정")]
+    public List<WaveData> waveSettings = new List<WaveData>();
 
-    private float spawnTimer;
+    [Header("연결된 매니저")]
+    public SpawnPoolManager spawnPoolManager;  // 풀 매니저 연결
+    public Transform player;
+
+    [Header("스폰 범위 설정")]
+    public float spawnRangeX = 15f;
+    public float spawnRangeY = 15f;
+    public float minSpawnDistanceFromPlayer = 5f;
+
+    private List<Coroutine> activeCoroutines = new List<Coroutine>();
+    private int currentWave = 1;
 
     private void Start()
     {
-        spawnTimer = spawnInterval;
+        if (player == null)
+            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        if (spawnPoolManager == null)
+            spawnPoolManager = FindObjectOfType<SpawnPoolManager>();
     }
 
-    private void Update()
+    // 웨이브 시작 시 호출
+    public void SetWave(int wave)
     {
-        spawnTimer -= Time.deltaTime;
-        if (spawnTimer <= 0f)
-        {
-            SpawnMonsters();
-            spawnTimer = spawnInterval;
-        }
-    }
+        StopAllCoroutines();
+        activeCoroutines.Clear();
 
-    private void SpawnMonsters()
-    {
-        if (monsterPoolNames == null || monsterPoolNames.Length == 0)
+        currentWave = wave;
+        WaveData data = waveSettings.Find(w => w.waveNumber == wave);
+
+        if (data == null)
         {
-            Debug.LogWarning("MonsterSpawner - 스폰할 몬스터 풀 이름이 없습니다!");
+            Debug.LogWarning("Wave 설정 없음: " + wave);
             return;
         }
 
-        for (int i = 0; i < spawnCountPerWave; i++)
+        foreach (MonsterSpawnInfo info in data.monsters)
         {
-            // 스폰 위치 랜덤 계산
-            Vector2 spawnPos = new Vector2(
-                Random.Range(spawnAreaMin.x, spawnAreaMax.x),
-                Random.Range(spawnAreaMin.y, spawnAreaMax.y)
-            );
+            Coroutine c = StartCoroutine(SpawnRoutine(info));
+            activeCoroutines.Add(c);
+        }
 
-            // 랜덤 풀 선택
-            string poolName = monsterPoolNames[Random.Range(0, monsterPoolNames.Length)];
+        Debug.Log($"[MonsterSpawner] Wave {wave} 시작됨 (스폰 종류: {data.monsters.Count})");
+    }
 
-            // 풀 매니저에서 스폰
-            var monster = SpawnPoolManager.Instance.SpawnFromPool(poolName, spawnPos, Quaternion.identity);
-            if (monster == null)
-            {
-                Debug.LogWarning($"MonsterSpawner - '{poolName}' 풀에서 몬스터를 가져오지 못했습니다!");
+    private IEnumerator SpawnRoutine(MonsterSpawnInfo info)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(info.spawnInterval);
+
+            if (player == null || spawnPoolManager == null)
                 continue;
-            }
+
+            Vector2 spawnPos;
+            int safetyLimit = 100;
+            do
+            {
+                spawnPos = new Vector2(Random.Range(-spawnRangeX, spawnRangeX),
+                                       Random.Range(-spawnRangeY, spawnRangeY));
+                safetyLimit--;
+                if (safetyLimit <= 0)
+                {
+                    Debug.LogWarning("Spawn 위치 찾기 실패");
+                    yield break;
+                }
+            } while (Vector2.Distance(spawnPos, player.position) < minSpawnDistanceFromPlayer);
+
+            // 오브젝트 풀에서 소환
+            GameObject monster = spawnPoolManager.SpawnFromPool(info.monsterTag, spawnPos, Quaternion.identity);
+
+            if (monster == null)
+                Debug.LogWarning($"[MonsterSpawner] {info.monsterTag} 풀에서 몬스터를 불러올 수 없음");
         }
     }
+    public void StopSpawning()
+    {
+        StopAllCoroutines();
+        activeCoroutines.Clear();
+        Debug.Log($"[MonsterSpawner] Wave {currentWave} 스폰 중지됨");
+    }
+
 }

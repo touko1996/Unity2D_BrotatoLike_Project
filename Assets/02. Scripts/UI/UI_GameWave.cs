@@ -40,7 +40,7 @@ public class UI_GameWave : MonoBehaviour
     private void UpdateUI()
     {
         if (timerText != null)
-            timerText.text = "Time: " + Mathf.CeilToInt(remainingTime).ToString();
+            timerText.text =  Mathf.CeilToInt(remainingTime).ToString();
 
         if (waveText != null)
             waveText.text = "Wave " + currentWave.ToString();
@@ -49,6 +49,7 @@ public class UI_GameWave : MonoBehaviour
     public void StartWave()
     {
         Debug.Log("Wave started: " + currentWave);
+        FindObjectOfType<MonsterSpawner>()?.SetWave(currentWave);
 
         isWaveActive = true;        // 반드시 true로 바꿔줘야 Update가 돌기 시작함
         remainingTime = waveDuration;
@@ -59,15 +60,34 @@ public class UI_GameWave : MonoBehaviour
     private void EndWave()
     {
         Debug.Log("Wave ended: " + currentWave);
-
         isWaveActive = false;
         remainingTime = 0f;
+
+        // 몬스터 스폰 중단
+        FindObjectOfType<MonsterSpawner>()?.StopSpawning();
+
+        // 플레이어 체력 풀로 회복
+        PlayerStats playerStats = FindObjectOfType<PlayerStats>();
+        if (playerStats != null)
+        {
+            playerStats.currentHp = playerStats.maxHp;
+            Debug.Log("[Wave End] HP recovered");
+        }
+
         UpdateUI();
 
+        // 상점 열기
         UI_ShopManager shopManager = FindObjectOfType<UI_ShopManager>();
         if (shopManager != null)
+        {
             shopManager.OnWaveEnd();
+        }
 
         currentWave++;
     }
+
+
+
+
+
 }

@@ -19,6 +19,6 @@ MonoBehaviour:
   damage: 5
   fireRate: 1
   detectionRange: 0
-  projectileSpeed: 5
+  projectileSpeed: 8
   tier: 1
   projectilePrefab: {fileID: 8301433787073505185, guid: da3bf5ec857a6cc46b425b0e64ee7617, type: 3}

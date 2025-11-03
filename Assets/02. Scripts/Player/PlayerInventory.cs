@@ -43,7 +43,22 @@ public class PlayerInventory : MonoBehaviour
         currentExp = 0f;
         expToNextLevel = Mathf.Pow(level + 4, 2);
         waveLevelUpCount++;
+
+        // 레벨업 시 체력 +2
+        PlayerStats stats = GetComponent<PlayerStats>();
+        if (stats != null)
+        {
+            stats.maxHp += 2f;
+            stats.currentHp += 2f;
+
+            // 체력이 최대치를 넘지 않게 보정
+            if (stats.currentHp > stats.maxHp)
+                stats.currentHp = stats.maxHp;
+
+            Debug.Log($"[LevelUp] 체력 +2 적용됨 (현재 HP: {stats.currentHp}/{stats.maxHp})");
+        }
     }
+
 
     public void ResetWaveLevelUpCount()
     {
