@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PassiveItem_2
   m_EditorClassIdentifier: 
   itemName: Lemonade
-  description: "\uB808\uBAAC\uC5D0\uC774\uB4DC \uC774\uB3D9\uC18D\uB3C4 5\uC99D\uAC00"
+  description: "\uB808\uBAAC\uC5D0\uC774\uB4DC \uC774\uB3D9\uC18D\uB3C4 +0.5"
   itemSprite: {fileID: 21300000, guid: 450fd127c160c024d91726a6c3896ffa, type: 3}
-  price: 0
+  price: 10
   damageBonus: 0
   rangeBonus: 0
   attackSpeedBonus: 0
-  moveSpeedBonus: 5
+  moveSpeedBonus: 0.5

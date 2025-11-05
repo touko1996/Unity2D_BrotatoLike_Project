@@ -183,3 +183,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7dbeab4fe37e05b4496d6f049a6e2120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  coinValue: 1
+  expValue: 1
+  attractRange: 2
+  moveSpeed: 10
+  pickupDistance: 0.5

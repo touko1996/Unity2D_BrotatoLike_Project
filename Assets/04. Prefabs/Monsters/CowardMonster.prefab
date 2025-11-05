@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7504732257833127339}
   - component: {fileID: 960569474578404508}
   - component: {fileID: 6051386641034671511}
+  - component: {fileID: 5168973794822155891}
   m_Layer: 8
   m_Name: CowardMonster
   m_TagString: Monster
@@ -161,12 +162,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6458cd3a61a6ca04385597de39d64eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 50
-  moveSpeed: 5
+  hp: 25
+  moveSpeed: 4
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
   stopRange: 4
-  attackRange: 5
+  attackRange: 10
   projectileSpeed: 8
   shootInterval: 2
   projectilePrefab: {fileID: 9134859640723060283, guid: f885a768b932d624f8a6bccbc978d1ad, type: 3}
+--- !u!114 &5168973794822155891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4553679516560741047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8700c5312b7063346bbe5ab16ea1f18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleAmount: 0.03
+  speed: 8

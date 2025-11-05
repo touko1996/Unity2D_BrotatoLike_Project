@@ -162,8 +162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a41475ea96a64c84ea4b78cba353498f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 50
-  moveSpeed: 5
+  hp: 10
+  moveSpeed: 3
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
 --- !u!114 &2298920529724240146

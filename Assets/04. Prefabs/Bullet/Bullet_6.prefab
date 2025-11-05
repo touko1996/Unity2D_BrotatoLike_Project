@@ -163,3 +163,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifetime: 2
   damage: 10
+  damageTextPrefab: {fileID: 4134768287408873150, guid: a9b30ab07520fcf46ab4b760f34ab97f, type: 3}
+  bulletSpeed: 10

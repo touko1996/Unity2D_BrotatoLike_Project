@@ -14,6 +14,7 @@ public class ChargingMonster : Monster
     private bool isCharging = false;
     private bool isWaiting = false;
     private Color defaultColor;
+    private Coroutine chargeRoutine;
 
     protected override void Start()
     {
@@ -22,7 +23,7 @@ public class ChargingMonster : Monster
             defaultColor = spriteRenderer.color;
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
         // Time.timeScale이 0일 때(스탯 선택창 등) 멈춤
         if (Time.timeScale == 0f) return;
@@ -33,7 +34,7 @@ public class ChargingMonster : Monster
         // 돌진 준비 조건
         if (!isCharging && !isWaiting && distance <= chargeRange)
         {
-            StartCoroutine(Charge());
+            chargeRoutine = StartCoroutine(Charge());
         }
 
         // 돌진 중/준비 중 아닐 때만 기본 이동
@@ -46,10 +47,10 @@ public class ChargingMonster : Monster
         if (isCharging || isWaiting)
             yield break; // 중복 돌진 방지
 
-        // 전조 상태
         isWaiting = true;
         float timer = 0f;
 
+        // 전조 반짝임
         while (timer < chargeDelay)
         {
             if (spriteRenderer != null)
@@ -69,14 +70,23 @@ public class ChargingMonster : Monster
         isWaiting = false;
         isCharging = true;
 
+        if (player == null)
+        {
+            ResetState();
+            yield break;
+        }
+
         Vector2 dir = (player.position - transform.position).normalized;
         timer = 0f;
 
+        // 돌진
         while (timer < chargeTime)
         {
+            if (float.IsNaN(dir.x) || float.IsNaN(dir.y)) break;
+
             rb.MovePosition(rb.position + dir * chargeSpeed * Time.deltaTime);
 
-            // 돌진 중에도 방향 유지
+            // 방향 유지
             if (player != null)
             {
                 float deltaX = player.position.x - transform.position.x;
@@ -87,19 +97,49 @@ public class ChargingMonster : Monster
             yield return null;
         }
 
-        isCharging = false;
+        ResetState();
     }
 
-    //  부모의 OnCollisionEnter2D 유지 (contactDamage 계산 정상 작동)
+    // 부모의 OnCollisionEnter2D 유지 (contactDamage 계산 정상 작동)
     protected override void OnCollisionEnter2D(Collision2D collision)
     {
-        base.OnCollisionEnter2D(collision); // 기본 접촉 데미지 호출
+        base.OnCollisionEnter2D(collision);
 
-        // 돌진 중 충돌 시 돌진 종료
-        if (collision.collider.CompareTag("Player") && isCharging)
+        // 돌진 중 충돌 시 즉시 종료
+        if (isCharging)
         {
-            isCharging = false;
-            Debug.Log($"{gameObject.name} 돌진 중 플레이어와 충돌 → 돌진 종료");
+            Debug.Log($"{gameObject.name} 돌진 중 충돌 발생 → 돌진 종료");
+            StopCharge();
         }
+    }
+
+    // 돌진 강제 중단
+    private void StopCharge()
+    {
+        if (chargeRoutine != null)
+        {
+            StopCoroutine(chargeRoutine);
+            chargeRoutine = null;
+        }
+
+        ResetState();
+    }
+
+    // 상태 및 색상 초기화
+    private void ResetState()
+    {
+        isCharging = false;
+        isWaiting = false;
+
+        if (spriteRenderer != null)
+            spriteRenderer.color = defaultColor;
+
+        if (rb != null)
+            rb.velocity = Vector2.zero;
+    }
+
+    private void OnEnable()
+    {
+        ResetState();
     }
 }

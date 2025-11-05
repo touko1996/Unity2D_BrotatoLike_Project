@@ -13,13 +13,16 @@ public class PlayerTester : MonoBehaviour
     [SerializeField] private GameObject weaponRoot;
 
     private PlayerStats _playerStats;
+    private PlayerInventory _playerInventory;
 
     private void Start()
     {
         _playerStats = GetComponent<PlayerStats>();
-        if (_playerStats == null)
+        _playerInventory = GetComponent<PlayerInventory>();
+
+        if (_playerStats == null || _playerInventory == null)
         {
-            Debug.LogError("PlayerStats 컴포넌트가 없습니다.");
+            Debug.LogError("PlayerStats 또는 PlayerInventory 컴포넌트를 찾을 수 없습니다.");
             return;
         }
 
@@ -33,22 +36,29 @@ public class PlayerTester : MonoBehaviour
         foreach (WeaponData weaponData in testWeapons)
         {
             if (weaponData != null)
-                weaponData.ApplyEffect(weaponRoot);
+            {
+                WeaponData clone = ScriptableObject.Instantiate(weaponData);
+                clone.ApplyEffect(weaponRoot);
+
+                // 인벤토리에도 추가 (UI 반영용)
+                _playerInventory.ownedItems.Add(clone);
+            }
         }
 
         // 테스트용 패시브 적용
         foreach (PassiveItem passive in testPassives)
         {
             if (passive != null)
-                passive.ApplyEffect(gameObject);
+            {
+                PassiveItem clone = ScriptableObject.Instantiate(passive);
+                clone.ApplyEffect(gameObject);
+                _playerInventory.ownedItems.Add(clone);
+            }
         }
 
-        
+        // UI 갱신 호출
+        _playerInventory.OnInventoryChanged?.Invoke();
 
-        // 현재 스탯 로그 출력
-        Debug.Log("공격력: " + _playerStats.currentDamage);
-        Debug.Log("사정거리: " + _playerStats.currentRange);
-        Debug.Log("공격속도: " + _playerStats.currentAttackSpeed);
-        Debug.Log("이동속도: " + _playerStats.currentMoveSpeed);
+        Debug.Log("테스트 아이템 적용 완료");
     }
 }

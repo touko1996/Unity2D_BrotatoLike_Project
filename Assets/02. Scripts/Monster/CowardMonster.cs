@@ -11,7 +11,7 @@ public class CowardMonster : Monster
 
     private float shootTimer;
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
         if (player == null) return;
         if (Time.timeScale == 0f) return;
