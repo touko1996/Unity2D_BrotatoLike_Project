@@ -15,10 +15,11 @@ MonoBehaviour:
   itemName: Laser_pistol
   description: "\uB808\uC774\uC800 \uAD8C\uCD1D"
   itemSprite: {fileID: 21300000, guid: d55ff1fa9f2e18349bdef7030a5fff25, type: 3}
-  price: 0
+  price: 12
   damage: 5
   fireRate: 1
   detectionRange: 0
   projectileSpeed: 8
   tier: 1
   projectilePrefab: {fileID: 8301433787073505185, guid: 523c121c378a7f342bf9920373091d64, type: 3}
+  fireSFX: {fileID: 8300000, guid: ab297b593498a6e47ba84de770477cbe, type: 3}

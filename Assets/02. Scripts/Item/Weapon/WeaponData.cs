@@ -11,6 +11,9 @@ public class WeaponData : Item
     public int tier = 1;
     public GameObject projectilePrefab;
 
+    [Header("사운드 설정")]
+    public AudioClip fireSFX; // 무기 발사음
+
     public override void ApplyEffect(GameObject player)
     {
         WeaponSlotManager slotManager = Object.FindObjectOfType<WeaponSlotManager>();

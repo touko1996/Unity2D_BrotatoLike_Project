@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Lost_duck
   description: "\uC5B4\uB9B0 \uC2DC\uC808 \uC783\uC5B4\uBC84\uB838\uB358 \uC624\uB9AC\uC778\uD615
-    \uACF5\uACA9\uC18D\uB3C4 5 \uC99D\uAC00"
+    \uACF5\uACA9\uC18D\uB3C4 +0.2"
   itemSprite: {fileID: 21300000, guid: 3ed2b4f766c395245894bf0d4925116a, type: 3}
-  price: 0
+  price: 10
   damageBonus: 0
   rangeBonus: 0
-  attackSpeedBonus: 5
+  attackSpeedBonus: 0.2
   moveSpeedBonus: 0

@@ -30,6 +30,11 @@ public class MonsterSpawner : MonoBehaviour
     public float spawnRangeY = 15f;
     public float minSpawnDistanceFromPlayer = 5f;
 
+    [Header("몬스터 스케일링 설정")]
+    public float hpMultiplierPerWave = 1.1f;       // 웨이브마다 HP +10%
+    public float damageMultiplierPerWave = 1.05f;  // 웨이브마다 공격력 +5%
+    public float speedMultiplierPerWave = 1.03f;   // 웨이브마다 이동속도 +3%
+
     private List<Coroutine> activeCoroutines = new List<Coroutine>();
     private int currentWave = 1;
 
@@ -75,6 +80,7 @@ public class MonsterSpawner : MonoBehaviour
             if (player == null || spawnPoolManager == null)
                 continue;
 
+            // 스폰 위치 계산
             Vector2 spawnPos;
             int safetyLimit = 100;
             do
@@ -90,17 +96,31 @@ public class MonsterSpawner : MonoBehaviour
             } while (Vector2.Distance(spawnPos, player.position) < minSpawnDistanceFromPlayer);
 
             // 오브젝트 풀에서 소환
-            GameObject monster = spawnPoolManager.SpawnFromPool(info.monsterTag, spawnPos, Quaternion.identity);
+            GameObject monsterObj = spawnPoolManager.SpawnFromPool(info.monsterTag, spawnPos, Quaternion.identity);
 
-            if (monster == null)
+            if (monsterObj == null)
+            {
                 Debug.LogWarning($"[MonsterSpawner] {info.monsterTag} 풀에서 몬스터를 불러올 수 없음");
+                continue;
+            }
+
+            // 웨이브 기반 능력치 스케일 적용
+            Monster monster = monsterObj.GetComponent<Monster>();
+            if (monster != null)
+            {
+                float hpScale = Mathf.Pow(hpMultiplierPerWave, currentWave - 1);
+                float dmgScale = Mathf.Pow(damageMultiplierPerWave, currentWave - 1);
+                float spdScale = Mathf.Pow(speedMultiplierPerWave, currentWave - 1);
+
+                monster.SetWaveScaling(hpScale, dmgScale, spdScale);
+            }
         }
     }
+
     public void StopSpawning()
     {
         StopAllCoroutines();
         activeCoroutines.Clear();
         Debug.Log($"[MonsterSpawner] Wave {currentWave} 스폰 중지됨");
     }
-
 }

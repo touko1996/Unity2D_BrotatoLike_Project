@@ -285,7 +285,7 @@ MonoBehaviour:
   m_StartAxis: 0
   m_CellSize: {x: 80, y: 80}
   m_Spacing: {x: 10, y: 10}
-  m_Constraint: 0
+  m_Constraint: 2
   m_ConstraintCount: 2
 --- !u!1 &736661646
 GameObject:
@@ -741,7 +741,7 @@ MonoBehaviour:
   m_StartAxis: 0
   m_CellSize: {x: 80, y: 80}
   m_Spacing: {x: 10, y: 10}
-  m_Constraint: 0
+  m_Constraint: 2
   m_ConstraintCount: 2
 --- !u!1 &1250243505
 GameObject:
@@ -1129,7 +1129,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1731566868}
         m_TargetAssemblyTypeName: GameOverUI, Assembly-CSharp
-        m_MethodName: OnClickQuit
+        m_MethodName: OnClickExit
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1301,6 +1301,8 @@ MonoBehaviour:
   resultText: {fileID: 1810427614}
   weaponListText: {fileID: 0}
   passiveListText: {fileID: 0}
+  mainMenuScene: MainMenuScene
+  battleScene: BattleScene
 --- !u!114 &1731566869
 MonoBehaviour:
   m_ObjectHideFlags: 0

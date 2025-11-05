@@ -46,7 +46,7 @@ public class MoneyMonster : Monster
         }
     }
 
-    protected override void Update()
+    protected override void FixedUpdate()
     {
         // 플레이어 추적 로직은 완전히 비활성화
         // PerlinWander가 자동으로 이동을 처리하므로 Update는 비워둔다.

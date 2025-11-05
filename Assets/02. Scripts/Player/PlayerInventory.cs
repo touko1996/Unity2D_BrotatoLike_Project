@@ -26,6 +26,7 @@ public class PlayerInventory : MonoBehaviour
         gold += coin;
         AddExperience(exp);
         uiPlayerStatus?.UpdateCoinUI(gold);
+        OnInventoryChanged?.Invoke(); // 실시간 반영
     }
 
     public void AddExperience(float exp)
@@ -51,14 +52,14 @@ public class PlayerInventory : MonoBehaviour
             stats.maxHp += 2f;
             stats.currentHp += 2f;
 
-            // 체력이 최대치를 넘지 않게 보정
             if (stats.currentHp > stats.maxHp)
                 stats.currentHp = stats.maxHp;
 
             Debug.Log($"[LevelUp] 체력 +2 적용됨 (현재 HP: {stats.currentHp}/{stats.maxHp})");
         }
-    }
 
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxLevelUp, 1f);
+    }
 
     public void ResetWaveLevelUpCount()
     {
@@ -98,8 +99,7 @@ public class PlayerInventory : MonoBehaviour
 
                 gold -= weapon.price;
                 uiPlayerStatus?.UpdateCoinUI(gold);
-                OnInventoryChanged?.Invoke();
-
+                OnInventoryChanged?.Invoke(); // 실시간 반영
                 Debug.Log("[BuyItem] 동일 무기 발견 → 복제본 티어업 (" + sameWeapon.itemName + " Tier " + sameWeapon.tier + ")");
                 return;
             }
@@ -121,8 +121,7 @@ public class PlayerInventory : MonoBehaviour
             clone.ApplyEffect(gameObject);
 
             uiPlayerStatus?.UpdateCoinUI(gold);
-            OnInventoryChanged?.Invoke();
-
+            OnInventoryChanged?.Invoke(); // 실시간 반영
             Debug.Log("[BuyItem] 복제본 무기 추가: " + clone.itemName);
             return;
         }
@@ -136,8 +135,7 @@ public class PlayerInventory : MonoBehaviour
         cloneItem.ApplyEffect(gameObject);
 
         uiPlayerStatus?.UpdateCoinUI(gold);
-        OnInventoryChanged?.Invoke();
-
+        OnInventoryChanged?.Invoke(); // 실시간 반영
         Debug.Log("[BuyItem] 패시브 아이템 추가 (복제본): " + cloneItem.itemName);
     }
 
@@ -167,11 +165,14 @@ public class PlayerInventory : MonoBehaviour
             }
         }
 
-        gold += item.price / 2;
-        uiPlayerStatus?.UpdateCoinUI(gold);
-        OnInventoryChanged?.Invoke();
+        // 환불금 지급 (구매가의 50%)
+        int refundAmount = Mathf.RoundToInt(item.price * 0.5f);
+        gold += refundAmount;
 
-        Debug.Log("[Refund] 복제본 환불 완료: " + item.itemName);
+        uiPlayerStatus?.UpdateCoinUI(gold);
+        OnInventoryChanged?.Invoke(); // 실시간 반영
+
+        Debug.Log($"[Refund] {item.itemName} 환불 완료 (+{refundAmount}G)");
     }
 
     // ---------------------------------------------------------

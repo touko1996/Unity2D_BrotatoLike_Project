@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    [Header("기본 능력치")]
+    [Header("Base Stats")]
     [SerializeField] protected float hp = 50f;
     [SerializeField] protected float moveSpeed = 5f;
     [SerializeField] protected float contactDamage = 5f;
@@ -19,7 +19,7 @@ public class Monster : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    protected virtual void Update()
+    protected virtual void FixedUpdate()
     {
         if (player == null) return;
         Move();
@@ -28,7 +28,7 @@ public class Monster : MonoBehaviour
     protected virtual void Move()
     {
         Vector2 dir = (player.position - transform.position).normalized;
-        rb.MovePosition(rb.position + dir * moveSpeed * Time.deltaTime);
+        rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
 
         if (dir.x > 0)
             spriteRenderer.flipX = false;
@@ -42,20 +42,19 @@ public class Monster : MonoBehaviour
         if (hp <= 0)
             Die();
     }
+
     public virtual void Heal(float amount)
     {
         hp += amount;
         Debug.Log($"{gameObject.name} 회복됨 (+{amount}), 현재 HP: {hp}");
     }
+
     protected virtual void Die()
     {
         Debug.Log($"{gameObject.name} 사망");
 
-        // 아이템 드롭
         if (dropItemPrefab != null)
-        {
             Instantiate(dropItemPrefab, transform.position, Quaternion.identity);
-        }
 
         gameObject.SetActive(false);
     }
@@ -66,10 +65,17 @@ public class Monster : MonoBehaviour
         {
             PlayerStats playerStats = collision.collider.GetComponent<PlayerStats>();
             if (playerStats != null)
-            {
                 playerStats.TakeDamage(contactDamage);
-            }
         }
     }
 
+    // 웨이브별 스케일 조정 함수
+    public virtual void SetWaveScaling(float hpScale, float dmgScale, float spdScale)
+    {
+        hp *= hpScale;
+        contactDamage *= dmgScale;
+        moveSpeed *= spdScale;
+
+        Debug.Log($"[Monster Scaling] {gameObject.name} → HP x{hpScale:F2}, DMG x{dmgScale:F2}, SPD x{spdScale:F2}");
+    }
 }

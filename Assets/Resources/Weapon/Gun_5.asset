@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Gun_5
   m_EditorClassIdentifier: 
   itemName: Shuriken
-  description: 
+  description: "\uB098X\uD1A0\uC5D0\uC11C \uD6D4\uCCD0\uC628 \uC218\uB9AC\uAC80"
   itemSprite: {fileID: 21300000, guid: 09728d0c69faf7149891223001629d85, type: 3}
-  price: 0
+  price: 25
   damage: 12
   fireRate: 1
   detectionRange: 0
   projectileSpeed: 15
+  tier: 1
   projectilePrefab: {fileID: 6966470670166333611, guid: db2286ec1de245142b3ae9776413dd39, type: 3}
+  fireSFX: {fileID: 8300000, guid: a58e438b7cfa445498120af0e6169082, type: 3}

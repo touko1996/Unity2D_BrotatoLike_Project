@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Gun_6
   m_EditorClassIdentifier: 
   itemName: Launcher
-  description: 
+  description: "\uCE90\uB17C\uB7F0\uCCD0"
   itemSprite: {fileID: 21300000, guid: 8c0825fa8beb29d4096a7afea48b5fca, type: 3}
-  price: 0
+  price: 30
   damage: 10
   fireRate: 1
   detectionRange: 0
   projectileSpeed: 10
+  tier: 1
   projectilePrefab: {fileID: 2759362850912403331, guid: 654cf6ac3e75e1a4ebb37d8f9cb90cce, type: 3}
+  fireSFX: {fileID: 8300000, guid: af66162561d2eed40ad49268cab318bb, type: 3}

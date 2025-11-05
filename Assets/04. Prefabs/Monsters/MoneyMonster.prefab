@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2619010640459658970}
   - component: {fileID: 8548021839599482944}
   - component: {fileID: 3108930143325629655}
+  - component: {fileID: -7589408543102217799}
   m_Layer: 8
   m_Name: MoneyMonster
   m_TagString: Monster
@@ -182,6 +183,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733b3b01106391c49bb91fe98f5ffab8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
+  moveSpeed: 5
   noiseSpeed: 0.6
   noiseStrength: 1
+--- !u!114 &-7589408543102217799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3793428111580498405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8700c5312b7063346bbe5ab16ea1f18f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleAmount: 0.03
+  speed: 8

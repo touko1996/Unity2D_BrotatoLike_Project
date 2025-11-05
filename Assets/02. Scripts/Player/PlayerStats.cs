@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections; // 코루틴용 네임스페이스 추가
 
 public class PlayerStats : MonoBehaviour
 {
@@ -80,6 +81,9 @@ public class PlayerStats : MonoBehaviour
         isDead = true;
         Debug.Log("Die() called: Player HP reached 0");
 
+        // 게임오버 사운드 재생 (배경음악 정지 포함)
+        AudioManager.Instance.PlayGameOver();
+
         // 웨이브 저장
         UI_GameWave waveUI = FindObjectOfType<UI_GameWave>();
         if (waveUI != null)
@@ -96,11 +100,15 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Inventory data copied to PlayerPrefsData");
         }
 
-        // GameOverScene 로드
-        SceneManager.LoadScene("GameOverScene");
+        // 약간의 딜레이 후 게임오버 씬 로드
+        StartCoroutine(LoadGameOverSceneAfterDelay(1.5f));
     }
 
-
+    private IEnumerator LoadGameOverSceneAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene("GameOverScene");
+    }
 
     // ---------------------------------------------
     // HP UI 갱신
