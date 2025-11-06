@@ -162,15 +162,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6458cd3a61a6ca04385597de39d64eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 25
+  maxHealth: 20
   moveSpeed: 4
-  contactDamage: 5
+  contactDamage: 3
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
-  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
-  stopRange: 4
+  hitFlashMaterial: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
+  retreatRange: 4
   attackRange: 6
   projectileSpeed: 8
-  shootInterval: 2
+  shootCooldown: 2
   projectilePrefab: {fileID: 9134859640723060283, guid: f885a768b932d624f8a6bccbc978d1ad, type: 3}
 --- !u!114 &5168973794822155891
 MonoBehaviour:

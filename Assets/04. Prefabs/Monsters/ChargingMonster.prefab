@@ -176,14 +176,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4f8a2a6a04d5a049b64de12ee33c3f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 30
+  maxHealth: 25
   moveSpeed: 4
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
-  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
-  chargeRange: 5
-  chargeSpeed: 40
-  chargeDelay: 1
-  chargeTime: 1.2
-  chargeWarningColor: {r: 1, g: 0, b: 0, a: 1}
-  flashSpeed: 8
+  hitFlashMaterial: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
+  chargeTriggerRange: 5
+  chargeMoveSpeed: 55
+  preChargeDelay: 1
+  chargeDuration: 1.3
+  preChargeColor: {r: 1, g: 0, b: 0, a: 1}
+  preChargeFlashSpeed: 8

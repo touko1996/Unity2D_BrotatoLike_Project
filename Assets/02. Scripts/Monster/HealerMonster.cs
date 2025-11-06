@@ -29,24 +29,15 @@ using UnityEngine;
 public class HealerMonster : Monster
 {
     [Header("힐러 몬스터 설정")]
-    [Tooltip("플레이어가 이 거리 안으로 들어오면 도망 시작")]
     [SerializeField] private float fleeRange = 4f;
-
-    [Tooltip("도망칠 때의 속도")]
     [SerializeField] private float fleeSpeed = 2f;
-
-    [Tooltip("힐 발동 주기 (초 단위)")]
     [SerializeField] private float healInterval = 4f;
-
-    [Tooltip("회복시킬 HP 양")]
     [SerializeField] private float healAmount = 5f;
+    [SerializeField] private float outlineShowTime = 0.8f;
 
-    [Tooltip("Outline(윤곽선) 효과 유지 시간")]
-    [SerializeField] private float outlineShowTime = 0.4f;
-
-    private float healTimer; // 힐 주기 타이머
-    private SpriteRenderer outlineRenderer; // 힐 시 표시되는 외곽선 스프라이트
-    private PerlinWander wander; // Perlin 기반 배회 제어용
+    private float healTimer;                    // 힐 주기 타이머
+    private SpriteRenderer outlineRenderer;     // 힐 시 표시되는 외곽선 스프라이트
+    private PerlinWander wander;                // Perlin 기반 배회 제어용
 
     protected override void Start()
     {
@@ -55,70 +46,72 @@ public class HealerMonster : Monster
         // PerlinWander 컴포넌트를 찾고 배회 시작
         wander = GetComponent<PerlinWander>();
         if (wander != null)
-        {
             wander.StartWander();
-        }
 
         // Outline 자식 오브젝트 탐색
-        var outline = transform.Find("Outline");
+        Transform outline = transform.Find("Outline");
         if (outline != null)
             outlineRenderer = outline.GetComponent<SpriteRenderer>();
 
-        // 초기에는 아웃라인 꺼둠
+        // 초기에는 외곽선 비활성화
         if (outlineRenderer != null)
             outlineRenderer.enabled = false;
     }
 
     protected override void FixedUpdate()
     {
-        if (player == null) return;
+        if (playerTransform == null) return;
+        if (Time.timeScale == 0f) return;
 
-        float distanceToPlayer = Vector2.Distance(player.position, transform.position);
+        float distanceToPlayer = Vector2.Distance(playerTransform.position, transform.position);
 
-        // 플레이어가 가까우면 도망 모드
+        // 1. 플레이어가 가까워지면 도망 모드
         if (distanceToPlayer <= fleeRange)
         {
             // 배회 정지
-            if (wander != null) wander.StopWander();
+            if (wander != null)
+                wander.StopWander();
 
             // 플레이어 반대 방향으로 이동
-            Vector2 dir = (transform.position - player.position).normalized;
-            rb.MovePosition(rb.position + dir * fleeSpeed * Time.deltaTime);
+            Vector2 fleeDirection = (transform.position - playerTransform.position).normalized;
+            rigidBody.MovePosition(rigidBody.position + fleeDirection * fleeSpeed * Time.deltaTime);
 
-            // 방향 전환
-            spriteRenderer.flipX = dir.x < 0f;
+            // 스프라이트 방향 반전
+            spriteRenderer.flipX = fleeDirection.x < 0f;
         }
+        // 2. 플레이어가 멀어지면 배회 재개
         else
         {
-            // 플레이어가 멀면 배회 재개
-            if (wander != null) wander.StartWander();
+            if (wander != null)
+                wander.StartWander();
         }
 
-        // 일정 주기마다 힐 발동
+        // 3. 일정 주기마다 힐 발동
         healTimer -= Time.deltaTime;
         if (healTimer <= 0)
         {
-            HealAllMonsters();
+            HealNearbyMonsters();
             healTimer = healInterval;
-            StartCoroutine(OutlineEffectSimple());
+
+            StartCoroutine(OutlineEffectCoroutine());
         }
     }
 
-    private void HealAllMonsters()
+    // 주변 몬스터 모두 회복
+    private void HealNearbyMonsters()
     {
         GameObject[] monsters = GameObject.FindGameObjectsWithTag("Monster");
 
         foreach (GameObject monsterObj in monsters)
         {
-            Monster m = monsterObj.GetComponent<Monster>();
-            if (m != null && m != this)
-                m.Heal(healAmount);
+            Monster targetMonster = monsterObj.GetComponent<Monster>();
+            if (targetMonster != null && targetMonster != this)
+                targetMonster.Heal(healAmount);
         }
-
-        Debug.Log($"{gameObject.name}이 주변 몬스터를 회복시켰습니다 (+{healAmount})");
     }
 
-    private IEnumerator OutlineEffectSimple()
+    // 외곽선 효과 표시 코루틴
+    private IEnumerator OutlineEffectCoroutine()
     {
         if (outlineRenderer == null) yield break;
 

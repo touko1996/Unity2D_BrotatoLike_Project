@@ -128,11 +128,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a828625fa3f8d7f41984f0f6020a5cf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 50
+  maxHealth: 30
   moveSpeed: 5
-  contactDamage: 5
+  contactDamage: 3
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
-  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
+  hitFlashMaterial: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
   minCoinDrop: 3
   maxCoinDrop: 7
   coinPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
@@ -185,8 +185,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  noiseSpeed: 0.6
-  noiseStrength: 1
+  noiseChangeSpeed: 0.6
+  noiseIntensity: 1
 --- !u!114 &-7589408543102217799
 MonoBehaviour:
   m_ObjectHideFlags: 0

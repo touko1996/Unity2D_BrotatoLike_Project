@@ -3,115 +3,114 @@ using System.Collections;
 
 public class Monster : MonoBehaviour
 {
-    [Header("Base Stats")]
-    [SerializeField] protected float hp = 50f;
-    [SerializeField] protected float moveSpeed = 5f;
-    [SerializeField] protected float contactDamage = 5f;
-    [SerializeField] private GameObject dropItemPrefab;
+    [Header("기본 스탯")]
+    [SerializeField] protected float maxHealth = 50f;           // 최대 체력
+    [SerializeField] protected float moveSpeed = 5f;            // 이동 속도
+    [SerializeField] protected float contactDamage = 5f;        // 플레이어 접촉 시 피해량
+    [SerializeField] private GameObject dropItemPrefab;         // 드랍 아이템 프리팹
 
-    [Header("Hit Effect Settings")]
-    [SerializeField] private Material whiteFlashMat;
+    [Header("피격 효과 설정")]
+    [SerializeField] private Material hitFlashMaterial;         // 피격 시 잠깐 바뀌는 하얀색 머티리얼
 
-    protected Transform player;
-    protected SpriteRenderer spriteRenderer;
-    protected Rigidbody2D rb;
+    protected Transform playerTransform;                        // 플레이어 Transform
+    protected SpriteRenderer spriteRenderer;                    // 몬스터 SpriteRenderer
+    protected Rigidbody2D rigidBody;                            // 몬스터 Rigidbody
 
-    protected Material originalMat;
-    private Color originalColor;
-
-    protected float baseHp;
+    protected Material originalMaterial;                        // 원래 머티리얼
+    protected Color originalColor;                              // 원래 색상
+    protected float currentHealth;                              // 현재 체력
 
     protected virtual void Start()
     {
-        player = GameObject.FindWithTag("Player")?.transform;
+        playerTransform = GameObject.FindWithTag("Player")?.transform;
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        rb = GetComponent<Rigidbody2D>();
+        rigidBody = GetComponent<Rigidbody2D>();
 
         if (spriteRenderer != null)
         {
-            originalMat = spriteRenderer.sharedMaterial;
+            originalMaterial = spriteRenderer.sharedMaterial;
             originalColor = spriteRenderer.color;
         }
-        else
-        {
-            Debug.LogWarning(gameObject.name + " could not find SpriteRenderer.");
-        }
-        baseHp = hp;
+
+        currentHealth = maxHealth;
     }
 
     protected virtual void FixedUpdate()
     {
-        if (player == null) return;
+        if (playerTransform == null) return;
         Move();
     }
-
+    
+    //기본 추격 이동 로직
     protected virtual void Move()
     {
-        Vector2 dir = (player.position - transform.position).normalized;
-        rb.MovePosition(rb.position + dir * moveSpeed * Time.fixedDeltaTime);
+        Vector2 moveDirection = (playerTransform.position - transform.position).normalized;
+        rigidBody.MovePosition(rigidBody.position + moveDirection * moveSpeed * Time.fixedDeltaTime);
 
-        if (dir.x > 0)
+        // 좌우 반전
+        if (moveDirection.x > 0)
             spriteRenderer.flipX = false;
-        else if (dir.x < 0)
+        else if (moveDirection.x < 0)
             spriteRenderer.flipX = true;
     }
-
+    
+    // 피해를 받을 때 호출
     public virtual void ReceiveDamage(float damage)
     {
-        hp -= damage;
-        Debug.Log(gameObject.name + " hit. HP: " + hp);
+        currentHealth -= damage;
+        Debug.Log($"{gameObject.name} hit! HP: {currentHealth}");
 
-        if (hp > 0 && spriteRenderer != null && whiteFlashMat != null)
-            StartCoroutine(FlashWhite());
+        if (currentHealth > 0 && spriteRenderer != null && hitFlashMaterial != null)
+            StartCoroutine(FlashWhiteOnce());
 
-        if (hp <= 0)
+        if (currentHealth <= 0)
             Die();
     }
 
-    private IEnumerator FlashWhite()
+    private IEnumerator FlashWhiteOnce()
     {
-        if (spriteRenderer == null || whiteFlashMat == null)
+        if (spriteRenderer == null || hitFlashMaterial == null)
             yield break;
 
-        if (originalMat == null)
-            originalMat = spriteRenderer.sharedMaterial;
+        if (originalMaterial == null)
+            originalMaterial = spriteRenderer.sharedMaterial;
 
-        spriteRenderer.sharedMaterial = whiteFlashMat;
+        spriteRenderer.sharedMaterial = hitFlashMaterial;
         yield return new WaitForSeconds(0.1f);
-        spriteRenderer.sharedMaterial = originalMat;
+        spriteRenderer.sharedMaterial = originalMaterial;
     }
 
+    // 몬스터 사망 처리
     protected virtual void Die()
     {
-        Debug.Log(gameObject.name + " died");
-
         if (dropItemPrefab != null)
             Instantiate(dropItemPrefab, transform.position, Quaternion.identity);
 
-        Vector2 knockDir = Vector2.zero;
-        if (player != null)
-            knockDir = (transform.position - player.position).normalized;
+        Vector2 knockbackDir = Vector2.zero;
+        if (playerTransform != null)
+            knockbackDir = (transform.position - playerTransform.position).normalized;
 
-        StartCoroutine(DeathEffect(knockDir));
+        StartCoroutine(PlayDeathEffect(knockbackDir));
     }
 
-    public IEnumerator DeathEffect(Vector2 knockDir)
+    // 사망 시 넉백 + 회전 + 축소 연출
+    public IEnumerator PlayDeathEffect(Vector2 knockbackDir)
     {
         float duration = 0.4f;
         float timer = 0f;
 
         Vector3 startScale = transform.localScale;
         Vector3 startPos = transform.position;
-        float knockPower = 2f;
+        float knockbackPower = 2f;
         float rotationSpeed = 720f;
 
-        if (rb != null)
+        if (rigidBody != null)
         {
-            rb.velocity = Vector2.zero;
-            rb.isKinematic = true;
+            rigidBody.velocity = Vector2.zero;
+            rigidBody.isKinematic = true;
         }
 
-        Vector3 targetPos = startPos + (Vector3)(knockDir * knockPower);
+        Vector3 targetPos = startPos + (Vector3)(knockbackDir * knockbackPower);
         float moveTime = duration * 0.4f;
         timer = 0f;
 
@@ -140,10 +139,12 @@ public class Monster : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    //체력 회복 (힐러 몬스터 등에서 사용)
     public virtual void Heal(float amount)
     {
-        hp += amount;
-        Debug.Log(gameObject.name + " healed. HP: " + hp);
+        currentHealth += amount;
+        if (currentHealth > maxHealth)
+            currentHealth = maxHealth;
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
@@ -156,24 +157,41 @@ public class Monster : MonoBehaviour
         }
     }
 
-    public virtual void SetWaveScaling(float hpScale, float dmgScale, float spdScale)
+    // 웨이브 스케일링 적용 (체력, 공격력, 이동속도 조정)
+    public virtual void ApplyWaveScaling(float hpMultiplier, float damageMultiplier, float speedMultiplier)
     {
-        hp *= hpScale;
-        contactDamage *= dmgScale;
-        moveSpeed *= spdScale;
-
-        Debug.Log("[Monster Scaling] " + gameObject.name + " HP x" + hpScale + " DMG x" + dmgScale + " SPD x" + spdScale);
+        maxHealth *= hpMultiplier;
+        contactDamage *= damageMultiplier;
+        moveSpeed *= speedMultiplier;
+        currentHealth = maxHealth;
     }
+
+    /// <summary>
+    /// 스폰 시 초기화 (색상, 체력 등)
+    /// ChargingMonster 등 자식 클래스에서 override 가능
+    /// </summary>
     protected virtual void OnEnable()
     {
-        // 스폰 시 투명도 복원
-        if (spriteRenderer != null)
-        {
-            Color c = spriteRenderer.color;
-            c.a = 1f;
-            spriteRenderer.color = c;
-        }
-        hp = baseHp;
+        ResetMonsterState();
     }
 
+    protected virtual void ResetMonsterState()
+    {
+        if (spriteRenderer != null)
+        {
+            Color restored = spriteRenderer.color;
+            restored.a = 1f;
+            spriteRenderer.color = restored;
+        }
+
+        if (originalMaterial != null)
+        { 
+            spriteRenderer.sharedMaterial = originalMaterial;
+        }
+
+        currentHealth = maxHealth;
+
+        if (rigidBody != null)
+            rigidBody.velocity = Vector2.zero;
+    }
 }

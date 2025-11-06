@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
   m_Name: PassiveItem_3
   m_EditorClassIdentifier: 
-  itemName: Lost_duck
-  description: "\uC5B4\uB9B0 \uC2DC\uC808 \uC783\uC5B4\uBC84\uB838\uB358 \uC624\uB9AC\uC778\uD615
-    \uACF5\uACA9\uC18D\uB3C4 +0.3"
+  itemName: "\uC624\uB9AC\uC778\uD615"
+  description: "\uC5B4\uB9B0 \uC2DC\uC808 \uC783\uC5B4\uBC84\uB838\uB358\uAC74\uB370..
+    / \uACF5\uACA9\uC18D\uB3C4 +0.3"
   itemSprite: {fileID: 21300000, guid: 3ed2b4f766c395245894bf0d4925116a, type: 3}
   price: 10
   damageBonus: 0

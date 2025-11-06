@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
   m_Name: PassiveItem_4
   m_EditorClassIdentifier: 
-  itemName: Mastery
-  description: "\uB9C8\uC2A4\uD130\uB9AC \uB208\uC774 \uBA40\uACE0 \uD798\uC774 \uC138\uC9C4\uB2E4
+  itemName: "\uB9AC\uC2E0 \uC778\uD615"
+  description: "\uB9AC\uC2E0\uC758 \uC758\uC9C0\uAC00 \uB290\uAEF4\uC9C4\uB2E4 /
     \uACF5\uACA9\uB825 +3 \uC0AC\uAC70\uB9AC -1"
   itemSprite: {fileID: 21300000, guid: 6cca3f08e9ca6204386a1afaae38578d, type: 3}
   price: 10

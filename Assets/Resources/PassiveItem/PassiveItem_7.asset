@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
   m_Name: PassiveItem_7
   m_EditorClassIdentifier: 
-  itemName: Big_Arms
+  itemName: "\uAC70\uB300\uD55C \uD314"
   description: "\uD314\uC774 \uAC70\uB300\uD574\uC838 \uC57C\uAD6C\uC120\uC218\uC758
-    \uD22C\uB825\uC744 \uC5BB\uB294\uB2E4 \uC0AC\uAC70\uB9AC +1"
+    \uD22C\uB825\uC744 \uC5BB\uB294\uB2E4 / \uC0AC\uAC70\uB9AC +1"
   itemSprite: {fileID: 21300000, guid: c99c986eb831eb54d91c2685804e1e70, type: 3}
   price: 10
   damageBonus: 0
