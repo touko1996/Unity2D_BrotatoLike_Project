@@ -15,9 +15,19 @@ public class DamageText : MonoBehaviour
             text = GetComponentInChildren<TMP_Text>();
     }
 
+    // 기본: 흰색 데미지 (몬스터용)
     public void SetText(float damage)
     {
+        SetText(damage, Color.white);
+    }
+
+    // 오버로드: 색상 지정 (플레이어용 빨강 등)
+    public void SetText(float damage, Color color)
+    {
+        if (text == null) return;
+
         text.text = ((int)damage).ToString();
+        text.color = color;
         transform.localScale = Vector3.one * Random.Range(0.9f, 1.1f);
     }
 

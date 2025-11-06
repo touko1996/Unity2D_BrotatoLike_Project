@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Little_Muscle
   description: "\uD648\uD2B8\uB85C \uBBF8\uB2C8\uADFC\uC721\uC774 \uC0DD\uACBC\uB2E4
-    \uACF5\uACA9\uB825+4 \uC774\uB3D9\uC18D\uB3C4/\uC0AC\uAC70\uB9AC -2"
+    \uACF5\uACA9\uB825+5 \uC774\uB3D9\uC18D\uB3C4/\uC0AC\uAC70\uB9AC -1"
   itemSprite: {fileID: 21300000, guid: bf056bf9378564b449f82eed0653f4ac, type: 3}
   price: 15
-  damageBonus: 4
-  rangeBonus: -2
+  damageBonus: 5
+  rangeBonus: -1
   attackSpeedBonus: 0
-  moveSpeedBonus: -2
+  moveSpeedBonus: -1

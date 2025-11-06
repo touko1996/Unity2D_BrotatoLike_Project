@@ -19,5 +19,5 @@ MonoBehaviour:
   price: 25
   damageBonus: 2
   rangeBonus: 0.5
-  attackSpeedBonus: 0.2
+  attackSpeedBonus: 0.3
   moveSpeedBonus: 0.3

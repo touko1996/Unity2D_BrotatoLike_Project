@@ -4,10 +4,11 @@ using UnityEngine;
 public class MonsterAnimation : MonoBehaviour
 {
     [Header("크기 변화 설정")]
-    [SerializeField] private float scaleAmount = 0.03f; //크기 변화폭
-    [SerializeField] private float speed = 8f; //변하는 속도
+    [SerializeField] private float scaleAmount = 0.03f; // 크기 변화폭
+    [SerializeField] private float speed = 8f;          // 변하는 속도
 
     private Vector3 _originalScale;
+    private bool _isPaused = false; // 숨쉬기 멈춤 여부
 
     private void Start()
     {
@@ -16,7 +17,15 @@ public class MonsterAnimation : MonoBehaviour
 
     private void Update()
     {
-        float newY = _originalScale.y + Mathf.Sin(Time.time * speed) * scaleAmount; //Mathf.Sin은 -1부터 1까지 부드럽게 반복하는 곡선함수
+        if (_isPaused) return; // 멈춤 중이면 애니메이션 중단
+
+        float newY = _originalScale.y + Mathf.Sin(Time.time * speed) * scaleAmount;
         transform.localScale = new Vector3(_originalScale.x, newY, _originalScale.z);
+    }
+
+    // 외부에서 숨쉬기 멈추기 / 재개시키기
+    public void SetPaused(bool paused)
+    {
+        _isPaused = paused;
     }
 }
