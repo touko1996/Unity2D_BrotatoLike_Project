@@ -166,8 +166,9 @@ MonoBehaviour:
   moveSpeed: 4
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
+  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
   stopRange: 4
-  attackRange: 10
+  attackRange: 6
   projectileSpeed: 8
   shootInterval: 2
   projectilePrefab: {fileID: 9134859640723060283, guid: f885a768b932d624f8a6bccbc978d1ad, type: 3}

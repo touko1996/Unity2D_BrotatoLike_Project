@@ -138,8 +138,9 @@ public class ChargingMonster : Monster
             rb.velocity = Vector2.zero;
     }
 
-    private void OnEnable()
+    private new void OnEnable()
     {
         ResetState();
     }
+
 }

@@ -166,6 +166,7 @@ MonoBehaviour:
   moveSpeed: 3
   contactDamage: 5
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
+  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
 --- !u!114 &2298920529724240146
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,6 +15,10 @@ public class AudioManager : MonoBehaviour
     public AudioClip sfxGameOver;  // 게임오버
     public AudioClip sfxLevelUp;   // 레벨업
 
+    [Header("Volume Settings")]
+    [Range(0f, 1f)] public float bgmVolume = 0.3f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+
     private void Awake()
     {
         if (Instance == null)
@@ -27,6 +31,10 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        // 저장된 볼륨 불러오기
+        bgmVolume = PlayerPrefs.GetFloat("BGM_VOLUME", 0.3f);
+        sfxVolume = PlayerPrefs.GetFloat("SFX_VOLUME", 1f);
     }
 
     private void Start()
@@ -34,34 +42,54 @@ public class AudioManager : MonoBehaviour
         PlayBGM();
     }
 
-    public void PlayBGM(float volume = 0.5f)
+    public void PlayBGM()
     {
         if (bgmSource == null || bgmMain == null) return;
+
         bgmSource.clip = bgmMain;
         bgmSource.loop = true;
-        bgmSource.volume = volume;
+        bgmSource.volume = bgmVolume;
         bgmSource.Play();
     }
-
+    public void PlayBGM(float volume)
+    {
+        SetBGMVolume(volume);
+        PlayBGM();
+    }
     public void SetBGMVolume(float volume)
     {
+        bgmVolume = Mathf.Clamp01(volume);
         if (bgmSource != null)
-            bgmSource.volume = volume;
+            bgmSource.volume = bgmVolume;
+
+        PlayerPrefs.SetFloat("BGM_VOLUME", bgmVolume);
+        PlayerPrefs.Save();
     }
 
-    public void PlaySFX(AudioClip clip, float volume = 1f)
+    public void SetSFXVolume(float volume)
+    {
+        sfxVolume = Mathf.Clamp01(volume);
+        if (sfxSource != null)
+            sfxSource.volume = sfxVolume;
+
+        PlayerPrefs.SetFloat("SFX_VOLUME", sfxVolume);
+        PlayerPrefs.Save();
+    }
+
+    public void PlaySFX(AudioClip clip, float volumeMultiplier = 1f)
     {
         if (clip == null || sfxSource == null) return;
-        sfxSource.PlayOneShot(clip, volume);
+        float finalVolume = sfxVolume * volumeMultiplier;
+        sfxSource.PlayOneShot(clip, finalVolume);
     }
 
-    public void PlayGunSFX() => PlaySFX(sfxGun, 0.9f);
-    public void PlayCoinSFX() => PlaySFX(sfxCoin, 0.8f);
+    public void PlayGunSFX() => PlaySFX(sfxGun, 0.4f);
+    public void PlayCoinSFX() => PlaySFX(sfxCoin, 0.3f);
+    public void PlayLevelUpSFX() => PlaySFX(sfxLevelUp, 0.6f);
 
     public void PlayGameOver()
     {
-        // 배경음악 정지
-        if (bgmSource.isPlaying)
+        if (bgmSource != null && bgmSource.isPlaying)
             bgmSource.Stop();
 
         PlaySFX(sfxGameOver, 1f);

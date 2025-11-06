@@ -7,11 +7,12 @@ public class DropItem : MonoBehaviour
     public float expValue = 1f;
 
     [Header("Magnet Settings")]
-    public float attractRange = 4f;      // 플레이어를 끌어당기기 시작하는 거리
-    public float moveSpeed = 10f;        // 플레이어를 향해 이동하는 속도
-    public float pickupDistance = 0.5f;  // 자동으로 먹히는 거리
+    public float attractRange = 4f;
+    public float moveSpeed = 10f;
+    public float pickupDistance = 0.5f;
 
     private bool isCollected = false;
+    private bool isMagnetAbsorbed = false; // 자석 흡수 전용 플래그
     private Transform player;
 
     private void Start()
@@ -21,17 +22,16 @@ public class DropItem : MonoBehaviour
 
     private void Update()
     {
-        if (isCollected || player == null) return;
+        if (isCollected || player == null || isMagnetAbsorbed) return;
+        // 자석 흡수 중이면 이 스크립트에서 따로 이동하지 않음
 
         float distance = Vector2.Distance(transform.position, player.position);
 
-        // 플레이어가 범위 안으로 들어오면 따라가기 시작
         if (distance <= attractRange)
         {
             Vector2 direction = (player.position - transform.position).normalized;
             transform.position += (Vector3)(direction * moveSpeed * Time.deltaTime);
 
-            // 플레이어 근처로 도착하면 자동 획득 처리
             if (distance <= pickupDistance)
             {
                 Collect();
@@ -41,7 +41,7 @@ public class DropItem : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (isCollected) return;
+        if (isCollected || isMagnetAbsorbed) return;
 
         if (other.CompareTag("Player"))
         {
@@ -58,10 +58,15 @@ public class DropItem : MonoBehaviour
         if (inventory != null)
             inventory.AddReward(coinValue, expValue);
 
-        // 코인 획득 사운드 재생
         AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxCoin, 0.9f);
 
         Debug.Log("아이템 획득! 경험치 +" + expValue + ", 재화 +" + coinValue);
         Destroy(gameObject);
+    }
+
+    // 자석 흡수 시작 시 외부(UI_GameWave)에서 호출
+    public void SetMagnetAbsorbed()
+    {
+        isMagnetAbsorbed = true;
     }
 }
