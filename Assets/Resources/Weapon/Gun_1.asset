@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c5be47863ea92439acbd9180021470, type: 3}
   m_Name: Gun_1
   m_EditorClassIdentifier: 
-  itemName: Pistol
+  itemName: "\uD53C\uC2A4\uD1A8"
   description: "\uAE30\uBCF8\uC73C\uB85C \uC9C0\uAE09\uB418\uB294 \uAD8C\uCD1D"
   itemSprite: {fileID: 21300000, guid: 62ba9a06a9809c44fbf73bf1dcd499ac, type: 3}
   price: 10
   damage: 5
   fireRate: 1
   detectionRange: 0
-  projectileSpeed: 8
+  projectileSpeed: 10
   tier: 1
   projectilePrefab: {fileID: 8301433787073505185, guid: da3bf5ec857a6cc46b425b0e64ee7617, type: 3}
   fireSFX: {fileID: 8300000, guid: 3061c7b9b32d894478e4126ccce25ca3, type: 3}

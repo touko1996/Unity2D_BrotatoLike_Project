@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
   m_Name: PassiveItem_1
   m_EditorClassIdentifier: 
-  itemName: Injection
-  description: "\uC544\uD508 \uC8FC\uC0AC\uAE30 \uACF5\uACA9\uB825 +1"
+  itemName: "\uC8FC\uC0AC"
+  description: "\uC544\uD508 \uC8FC\uC0AC\uAE30 / \uACF5\uACA9\uB825 +1"
   itemSprite: {fileID: 21300000, guid: 5097d7c03a266144199317606dbb80cc, type: 3}
   price: 10
   damageBonus: 1

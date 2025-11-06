@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
   m_Name: PassiveItem_2
   m_EditorClassIdentifier: 
-  itemName: Lemonade
-  description: "\uB808\uBAAC\uC5D0\uC774\uB4DC \uC774\uB3D9\uC18D\uB3C4 +0.5"
+  itemName: "\uB808\uBAAC\uC5D0\uC774\uB4DC"
+  description: "\uC73C\uB9E4 \uC2E0\uAC70 / \uC774\uB3D9\uC18D\uB3C4 +0.5"
   itemSprite: {fileID: 21300000, guid: 450fd127c160c024d91726a6c3896ffa, type: 3}
   price: 10
   damageBonus: 0

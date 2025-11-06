@@ -54,8 +54,6 @@ public class MoneyMonster : Monster
 
     protected override void Die()
     {
-        Debug.Log($"{gameObject.name} 사망 - 코인 드롭!");
-
         int coinCount = Random.Range(minCoinDrop, maxCoinDrop + 1);
 
         for (int i = 0; i < coinCount; i++)

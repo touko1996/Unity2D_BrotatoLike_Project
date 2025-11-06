@@ -248,11 +248,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb8c61efd845104881455e7d0319880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 20
+  maxHealth: 25
   moveSpeed: 5
-  contactDamage: 5
+  contactDamage: 3
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
-  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
+  hitFlashMaterial: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
   fleeRange: 4
   fleeSpeed: 2
   healInterval: 4
@@ -285,5 +285,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 2
-  noiseSpeed: 0.6
-  noiseStrength: 1
+  noiseChangeSpeed: 0.6
+  noiseIntensity: 1

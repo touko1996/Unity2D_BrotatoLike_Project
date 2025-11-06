@@ -176,14 +176,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc752c7954ff20c44aaef3b429102989, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 800
-  moveSpeed: 5
+  maxHealth: 500
+  moveSpeed: 3
   contactDamage: 10
   dropItemPrefab: {fileID: 4649632086533550599, guid: 3fe83be7c5d21d645a8bfec2172a8117, type: 3}
-  whiteFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
-  attackPrefab: {fileID: 2323742144552922442, guid: 0e3d7d750ea55f343bb6743bc9553108, type: 3}
-  attackRange: 6
-  attackDelay: 0.5
-  attackCooldown: 1.8
-  attackDamage: 15
-  bossFlashMat: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
+  hitFlashMaterial: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}
+  bossAttackPrefab: {fileID: 2323742144552922442, guid: 0e3d7d750ea55f343bb6743bc9553108, type: 3}
+  bossAttackRange: 7
+  bossAttackChargeTime: 0.5
+  bossAttackCooldown: 1.5
+  bossAttackDamage: 15
+  bossHitFlashMaterial: {fileID: 2100000, guid: 494cc578fd31fef42aa622d0d8cf4c68, type: 2}

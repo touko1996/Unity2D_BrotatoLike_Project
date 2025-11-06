@@ -17,7 +17,7 @@ public class MonsterAnimation : MonoBehaviour
 
     private void Update()
     {
-        if (_isPaused) return; // 멈춤 중이면 애니메이션 중단
+        if (_isPaused) return; // 멈춰있다면 애니메이션 중단
 
         float newY = _originalScale.y + Mathf.Sin(Time.time * speed) * scaleAmount;
         transform.localScale = new Vector3(_originalScale.x, newY, _originalScale.z);

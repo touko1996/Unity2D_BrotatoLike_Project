@@ -2,52 +2,47 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    private Rigidbody2D _rigidbody2D;
-    private PlayerStats _playerStats;
-    private SpriteRenderer _spriteRenderer;
-    private PlayerAnimation _playerAnimation; 
+    private Rigidbody2D playerRb;
+    private PlayerStats playerStats;
+    private SpriteRenderer playerSr;
+    private PlayerAnimation playerAnim; 
 
-    private Vector2 _moveInput;
+    private Vector2 moveInput;
 
     private void Awake()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        _playerStats = GetComponent<PlayerStats>();
-        _playerAnimation = GetComponent<PlayerAnimation>(); 
+        playerRb = GetComponent<Rigidbody2D>();
+        playerSr = GetComponent<SpriteRenderer>();
+        playerStats = GetComponent<PlayerStats>();
+        playerAnim = GetComponent<PlayerAnimation>(); 
     }
 
     private void Update()
     {
-        // 입력 처리
-        _moveInput.x = Input.GetAxisRaw("Horizontal");
-        _moveInput.y = Input.GetAxisRaw("Vertical");
-        _moveInput.Normalize();
+        moveInput.x = Input.GetAxisRaw("Horizontal");
+        moveInput.y = Input.GetAxisRaw("Vertical");
+        moveInput.Normalize();
 
         // 좌우 반전 처리
-        if (_moveInput.x > 0) _spriteRenderer.flipX = false;
-        else if (_moveInput.x < 0) _spriteRenderer.flipX = true;
+        if (moveInput.x > 0) playerSr.flipX = false;
+        else if (moveInput.x < 0) playerSr.flipX = true;
 
         // 이동 중 여부 계산
-        bool isMoving = _moveInput.sqrMagnitude > 0.01f;
+        bool isMoving = moveInput.sqrMagnitude > 0.01f; //벡터길이의 제곱이 0.01보다 크면 이동중으로 간주
 
         // PlayerAnimation에 이동 여부 전달
-        if (_playerAnimation != null)
-            _playerAnimation.SetRunning(isMoving);
+        if (playerAnim != null)
+            playerAnim.SetRunning(isMoving);
 
        
     }
 
     private void FixedUpdate()
     {
-        if (_playerStats == null) return;
+        if (playerStats == null) return;
 
-        // PlayerStats의 이동 속도 사용
-        float currentSpeed = _playerStats.currentMoveSpeed;
+        float currentSpeed = playerStats.currentMoveSpeed;
 
-        // Rigidbody 이동
-        _rigidbody2D.MovePosition(
-            _rigidbody2D.position + _moveInput * currentSpeed * Time.fixedDeltaTime
-        );
+        playerRb.MovePosition( playerRb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
     }
 }

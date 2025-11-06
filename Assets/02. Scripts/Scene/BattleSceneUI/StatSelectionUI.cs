@@ -4,182 +4,150 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// [StatSelectionUI]
+/// ------------------------------------------------------------
+/// 스탯 선택 UI를 관리하는 스크립트
+/// - 웨이브 종료 후 플레이어가 스탯 보상을 선택할 수 있게 함
+/// - 무작위로 선택된 스탯 옵션을 표시하고 클릭 시 적용
+/// ------------------------------------------------------------
+/// </summary>
 public class StatSelectionUI : MonoBehaviour
 {
-    [Header("UI Elements")]
-    [SerializeField] private GameObject selectionPanel;
-    [SerializeField] private Button[] statButtons;
-    [SerializeField] private TMP_Text[] statNameTexts;
-    [SerializeField] private TMP_Text[] statDescTexts;
+    [Header("UI 구성요소")]
+    [SerializeField] private GameObject selectionPanel;     // 스탯 선택 패널
+    [SerializeField] private Button[] statButtons;          // 선택 버튼들
+    [SerializeField] private TMP_Text[] statNameTexts;      // 스탯 이름 텍스트
+    [SerializeField] private TMP_Text[] statDescTexts;      // 스탯 설명 텍스트
 
-    [Header("References")]
-    [SerializeField] private PlayerStats playerStats;
-    [SerializeField] private PlayerInventory playerInventory;
+    [Header("참조")]
+    [SerializeField] private PlayerStats playerStats;       // 플레이어 스탯
+    [SerializeField] private PlayerInventory playerInventory; // 인벤토리 참조 (선택 종료 시 연동용)
 
-    private List<StatOption> allStats = new List<StatOption>();
-    private List<StatOption> currentOptions = new List<StatOption>();
+    private List<StatOption> allStatOptions = new();        // 모든 스탯 목록
+    private List<StatOption> currentChoices = new();        // 현재 표시 중인 선택지
 
-    private int remainingSelections = 0;
-    private System.Action onCompleteCallback;
+    private int remainingSelections = 0;                    // 남은 선택 횟수
+    private System.Action onCompleteCallback;               // 선택 완료 시 실행할 콜백
 
     private void OnEnable()
     {
-        if (allStats == null || allStats.Count == 0)
-        {
+        // 스탯 목록이 비어있다면 초기화
+        if (allStatOptions == null || allStatOptions.Count == 0)
             InitializeStatOptions();
-        }
     }
 
+    /// <summary>
+    /// 스탯 옵션 초기화
+    /// </summary>
     private void InitializeStatOptions()
     {
-        allStats.Clear();
+        allStatOptions.Clear();
 
-        // add your stat options here
-        allStats.Add(new StatOption
+        // 기본 스탯 상승 옵션
+        allStatOptions.Add(new StatOption("근력운동", "공격력 +2", (p) => p.currentDamage += 2f));
+        allStatOptions.Add(new StatOption("KBO 시청", "사거리 +1", (p) => p.currentRange += 1f));
+        allStatOptions.Add(new StatOption("핫식스 섭취", "공격속도 x1.15", (p) => p.currentAttackSpeed *= 1.15f));
+        allStatOptions.Add(new StatOption("하체운동", "이동속도 x1.1", (p) => p.currentMoveSpeed *= 1.1f));
+        allStatOptions.Add(new StatOption("숙면", "최대체력 +5", (p) =>
         {
-            statName = "근력운동",
-            description = "공격력 +2",
-            applyEffect = (p) => p.currentDamage += 2f
-        });
+            p.maxHp += 5f;
+            p.currentHp = Mathf.Min(p.currentHp + 5f, p.maxHp);
+        }));
 
-        allStats.Add(new StatOption
+        // 도박(랜덤 변동) 옵션
+        allStatOptions.Add(new StatOption("공격력 도박", "공격력이 -3~+5 범위에서 랜덤하게 변동된다.", (p) =>
         {
-            statName = "KBO 시청",
-            description = "사거리 +1",
-            applyEffect = (p) => p.currentRange += 1f
-        });
+            float randomChange = Random.Range(-3f, 5f);
+            p.currentDamage += randomChange;
+        }));
 
-        allStats.Add(new StatOption
+        allStatOptions.Add(new StatOption("사거리 도박", "사거리가 -2~+3 범위에서 랜덤하게 변동된다.", (p) =>
         {
-            statName = "핫식스 섭취",
-            description = "공격속도x1.15",
-            applyEffect = (p) => p.currentAttackSpeed *= 1.15f
-        });
+            float randomChange = Random.Range(-2f, 3f);
+            p.currentRange += randomChange;
+        }));
 
-        allStats.Add(new StatOption
+        allStatOptions.Add(new StatOption("최대체력 도박", "최대체력이 -5~+10 범위에서 랜덤하게 변동된다.", (p) =>
         {
-            statName = "하체운동",
-            description = "이동속도 x1.1",
-            applyEffect = (p) => p.currentMoveSpeed *= 1.1f
-        });
-
-        allStats.Add(new StatOption
-        {
-            statName = "숙면",
-            description = "최대체력 +5",
-            applyEffect = (p) =>
-            {
-                p.maxHp += 5f;
-                p.currentHp += 5f;
-            }
-        });
-
-        allStats.Add(new StatOption
-        {
-            statName = "공격력 도박",
-            description = "공격력이 -5~+5 범위에서 랜덤하게 변동된다.",
-            applyEffect = (p) =>
-            {
-                float randomChange = Random.Range(-5f, 5f);
-                p.currentDamage += randomChange;
-                Debug.Log($"[공격력 도박] 공격력 변화: {randomChange:+0.0;-0.0} → 현재 공격력: {p.currentDamage:0.0}");
-            }
-        });
-        allStats.Add(new StatOption
-        {
-            statName = "사거리 도박",
-            description = "사거리가 -3~+3 범위에서 랜덤하게 변동된다.",
-            applyEffect = (p) =>
-            {
-                float randomChange = Random.Range(-3f, 3f);
-                p.currentDamage += randomChange;
-                Debug.Log($"[사거리 도박] 사거리 변화: {randomChange:+0.0;-0.0} → 현재 사거리: {p.currentDamage:0.0}");
-            }
-        });
-        allStats.Add(new StatOption
-        {
-            statName = "최대체력 도박",
-            description = "체력이 -5~+10 범위에서 랜덤하게 변동된다.",
-            applyEffect = (p) =>
-            {
-                float randomChange = Random.Range(-5f, 10f);
-                p.currentDamage += randomChange;
-                Debug.Log($"[최대체력 도박] 최대체력 변화: {randomChange:+0.0;-0.0} → 현재 최대체력: {p.currentDamage:0.0}");
-            }
-        });
+            float randomChange = Random.Range(-5f, 10f);
+            p.maxHp = Mathf.Max(1f, p.maxHp + randomChange);
+            p.currentHp = Mathf.Min(p.currentHp, p.maxHp);
+        }));
     }
 
-    // this is the version that ShopManager will call
+    // ShopManager에서 호출하는 버전
     public void Open(int selectionCount, System.Action onComplete)
     {
         onCompleteCallback = onComplete;
         Open(selectionCount);
     }
 
-    // original version (can still be used)
+    /// <summary>
+    /// 스탯 선택창 열기
+    /// </summary>
     public void Open(int selectionCount)
     {
         remainingSelections = selectionCount;
 
         if (remainingSelections <= 0)
         {
-            // no stat to choose, just close
             Close();
             return;
         }
 
         selectionPanel.SetActive(true);
-        Time.timeScale = 0f;
-
+        Time.timeScale = 0f; // 일시정지
         PickRandomStats();
     }
 
+    /// <summary>
+    /// 무작위로 스탯 옵션을 추출하여 버튼에 표시
+    /// </summary>
     private void PickRandomStats()
     {
-        // make sure we have enough stats
-        int countToTake = Mathf.Min(statButtons.Length, allStats.Count);
+        int countToDisplay = Mathf.Min(statButtons.Length, allStatOptions.Count);
 
-        // shuffle and take
-        currentOptions = allStats
-            .OrderBy(x => Random.value)
-            .Take(countToTake)
+        // 무작위 셔플 후 일부 선택
+        currentChoices = allStatOptions
+            .OrderBy(_ => Random.value)
+            .Take(countToDisplay)
             .ToList();
 
         for (int i = 0; i < statButtons.Length; i++)
         {
-            if (i < currentOptions.Count)
+            if (i < currentChoices.Count)
             {
-                StatOption opt = currentOptions[i];
+                var option = currentChoices[i];
 
-                statNameTexts[i].text = opt.statName;
-                statDescTexts[i].text = opt.description;
+                statNameTexts[i].text = option.statName;
+                statDescTexts[i].text = option.description;
 
-                int index = i;
                 statButtons[i].onClick.RemoveAllListeners();
-                statButtons[i].onClick.AddListener(() => SelectStat(currentOptions[index]));
+                statButtons[i].onClick.AddListener(() => SelectStat(option));
 
                 statButtons[i].gameObject.SetActive(true);
             }
             else
             {
-                // hide extra buttons
                 statButtons[i].gameObject.SetActive(false);
             }
         }
     }
 
+    /// <summary>
+    /// 스탯 선택 시 적용 처리
+    /// </summary>
     private void SelectStat(StatOption selectedStat)
     {
-        if (selectedStat != null && selectedStat.applyEffect != null && playerStats != null)
-        {
-            selectedStat.applyEffect.Invoke(playerStats);
-        }
+        if (selectedStat == null || playerStats == null)
+            return;
 
+        selectedStat.applyEffect?.Invoke(playerStats);
         remainingSelections--;
 
         if (remainingSelections > 0)
         {
-            // show next stat choices
             PickRandomStats();
         }
         else
@@ -188,22 +156,15 @@ public class StatSelectionUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 스탯 선택창 닫기
+    /// </summary>
     public void Close()
     {
         selectionPanel.SetActive(false);
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; // 시간 재개
 
-        if (playerInventory != null)
-        {
-            // we were calling this before, but ShopManager also resets it
-            // you can remove this line if you want only ShopManager to handle it
-            // playerInventory.ResetWaveLevelUpCount();
-        }
-
-        if (onCompleteCallback != null)
-        {
-            onCompleteCallback.Invoke();
-            onCompleteCallback = null;
-        }
+        onCompleteCallback?.Invoke();
+        onCompleteCallback = null;
     }
 }

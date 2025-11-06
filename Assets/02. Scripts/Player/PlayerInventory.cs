@@ -12,21 +12,18 @@ public class PlayerInventory : MonoBehaviour
     public int gold = 0;
     public int waveLevelUpCount = 0;
 
-    [Header("보유 아이템 리스트 (복제본만 저장)")]
-    public List<Item> ownedItems = new List<Item>();
+    [Header("보유 아이템 리스트")]
+    public List<Item> ownedItems = new List<Item>(); // 복제본만 저장, 원본 SO는 절대 수정하지 않음
 
     [SerializeField] private UI_PlayerStatus uiPlayerStatus;
     public Action OnInventoryChanged;
 
-    // ---------------------------------------------------------
-    // 경험치 및 보상
-    // ---------------------------------------------------------
     public void AddReward(int coin, float exp)
     {
         gold += coin;
         AddExperience(exp);
         uiPlayerStatus?.UpdateCoinUI(gold);
-        OnInventoryChanged?.Invoke(); // 실시간 반영
+        OnInventoryChanged?.Invoke();
     }
 
     public void AddExperience(float exp)
@@ -45,20 +42,18 @@ public class PlayerInventory : MonoBehaviour
         expToNextLevel = Mathf.Pow(level + 4, 2);
         waveLevelUpCount++;
 
-        // 레벨업 시 체력 +2
         PlayerStats stats = GetComponent<PlayerStats>();
         if (stats != null)
         {
-            stats.maxHp += 2f;
-            stats.currentHp += 2f;
+            stats.maxHp += 5f;
+            stats.currentHp += 5f;
 
             if (stats.currentHp > stats.maxHp)
                 stats.currentHp = stats.maxHp;
-
-            Debug.Log($"[LevelUp] 체력 +2 적용됨 (현재 HP: {stats.currentHp}/{stats.maxHp})");
         }
 
-        AudioManager.Instance.PlaySFX(AudioManager.Instance.sfxLevelUp, 1f);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayLevelUpSFX();
     }
 
     public void ResetWaveLevelUpCount()
@@ -66,9 +61,6 @@ public class PlayerInventory : MonoBehaviour
         waveLevelUpCount = 0;
     }
 
-    // ---------------------------------------------------------
-    // 아이템 구매 (복제본만 저장, 원본 SO 절대 수정 안 함)
-    // ---------------------------------------------------------
     public void BuyItem(Item item)
     {
         if (item == null || gold < item.price) return;
@@ -77,18 +69,12 @@ public class PlayerInventory : MonoBehaviour
         if (weapon != null)
         {
             WeaponSlotManager slotManager = FindObjectOfType<WeaponSlotManager>();
-            if (slotManager == null)
-            {
-                Debug.LogWarning("[BuyItem] WeaponSlotManager를 찾을 수 없음");
-                return;
-            }
+            if (slotManager == null) return;
 
-            // 동일 이름 무기 복제본 검색
             WeaponData sameWeapon = ownedItems
                 .OfType<WeaponData>()
                 .FirstOrDefault(w => w.itemName == weapon.itemName);
 
-            // 동일 무기가 이미 있다면 -> 그 복제본을 티어업
             if (sameWeapon != null)
             {
                 sameWeapon.tier++;
@@ -99,20 +85,13 @@ public class PlayerInventory : MonoBehaviour
 
                 gold -= weapon.price;
                 uiPlayerStatus?.UpdateCoinUI(gold);
-                OnInventoryChanged?.Invoke(); // 실시간 반영
-                Debug.Log("[BuyItem] 동일 무기 발견 → 복제본 티어업 (" + sameWeapon.itemName + " Tier " + sameWeapon.tier + ")");
+                OnInventoryChanged?.Invoke();
                 return;
             }
 
-            // 슬롯이 가득 찼으면 구매 불가
             int equippedCount = slotManager.GetEquippedWeaponCount();
-            if (equippedCount >= 6)
-            {
-                Debug.Log("[BuyItem] 슬롯이 가득 차서 무기를 더 구매할 수 없음");
-                return;
-            }
+            if (equippedCount >= 6) return;
 
-            // 완전히 새로운 무기 -> 복제본 생성 후 사용
             WeaponData clone = ScriptableObject.Instantiate(weapon);
             clone.name = weapon.name + "_Clone";
 
@@ -121,12 +100,10 @@ public class PlayerInventory : MonoBehaviour
             clone.ApplyEffect(gameObject);
 
             uiPlayerStatus?.UpdateCoinUI(gold);
-            OnInventoryChanged?.Invoke(); // 실시간 반영
-            Debug.Log("[BuyItem] 복제본 무기 추가: " + clone.itemName);
+            OnInventoryChanged?.Invoke();
             return;
         }
 
-        // 패시브 아이템
         gold -= item.price;
         Item cloneItem = ScriptableObject.Instantiate(item);
         cloneItem.name = item.name + "_Clone";
@@ -135,13 +112,9 @@ public class PlayerInventory : MonoBehaviour
         cloneItem.ApplyEffect(gameObject);
 
         uiPlayerStatus?.UpdateCoinUI(gold);
-        OnInventoryChanged?.Invoke(); // 실시간 반영
-        Debug.Log("[BuyItem] 패시브 아이템 추가 (복제본): " + cloneItem.itemName);
+        OnInventoryChanged?.Invoke();
     }
 
-    // ---------------------------------------------------------
-    // 환불 (복제본 기준 동일하게 작동)
-    // ---------------------------------------------------------
     public void RefundItem(Item item)
     {
         if (!ownedItems.Contains(item)) return;
@@ -152,7 +125,7 @@ public class PlayerInventory : MonoBehaviour
             WeaponSlotManager slotManager = FindObjectOfType<WeaponSlotManager>();
             if (slotManager != null)
             {
-                slotManager.RemoveSingleWeaponByName(weaponData.itemName);
+                slotManager.RemoveWeaponByName(weaponData.itemName);
             }
         }
 
@@ -165,19 +138,13 @@ public class PlayerInventory : MonoBehaviour
             }
         }
 
-        // 환불금 지급 (구매가의 50%)
         int refundAmount = Mathf.RoundToInt(item.price * 0.5f);
         gold += refundAmount;
 
         uiPlayerStatus?.UpdateCoinUI(gold);
-        OnInventoryChanged?.Invoke(); // 실시간 반영
-
-        Debug.Log($"[Refund] {item.itemName} 환불 완료 (+{refundAmount}G)");
+        OnInventoryChanged?.Invoke();
     }
 
-    // ---------------------------------------------------------
-    // 리스트 반환
-    // ---------------------------------------------------------
     public List<WeaponData> GetOwnedWeapons()
     {
         return ownedItems.OfType<WeaponData>().ToList();
