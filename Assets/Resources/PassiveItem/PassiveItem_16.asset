@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
+  m_Name: PassiveItem_16
+  m_EditorClassIdentifier: 
+  itemName: "\uC2E4\uD5D8\uC57D"
+  description: "\uC5B4\uB5A4 \uB2A5\uB825\uC774 \uC99D\uAC00\uD560\uAE4C\uC694? 2\uD0C4"
+  itemSprite: {fileID: 21300000, guid: 01517b548da9e114e9f1c1bfa228a4f1, type: 3}
+  price: 15
+  damageBonus: 5
+  rangeBonus: -2
+  attackSpeedBonus: -2
+  moveSpeedBonus: -2

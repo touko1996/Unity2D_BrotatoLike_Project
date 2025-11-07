@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Monster
+  - BossMonster
   layers:
   - Default
   - TransparentFX
@@ -39,6 +40,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Ground
+    uniqueID: 4202029785
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
