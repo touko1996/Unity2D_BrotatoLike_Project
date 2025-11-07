@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BossMonster : Monster
 {
@@ -124,6 +125,8 @@ public class BossMonster : Monster
         UI_GameWave waveUI = FindObjectOfType<UI_GameWave>();
         if (waveUI != null)
             waveUI.ForceEndWave();
+
+        SceneManager.LoadScene("GameClearScene");
     }
 
     // 공격이 플레이어에 닿았을 때 데미지 적용

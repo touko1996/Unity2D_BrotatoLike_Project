@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 88a228482c09a904a804ed9d7e0e8ee6, type: 3}
-  m_Name: PassiveItem_6
+  m_Name: PassiveItem_11
   m_EditorClassIdentifier: 
-  itemName: "\uCC9C\uC0AC\uC758 \uB0A0\uAC1C"
-  description: "\uB0A0\uB77C\uB2E4\uB2C8\uB2C8 \uC88B\uB124 / \uC774\uB3D9\uC18D\uB3C4
-    +1 \uACF5\uACA9\uB825 -1"
-  itemSprite: {fileID: 21300000, guid: b2612ab6a3755a047b2b64b377b8e4f9, type: 3}
-  price: 15
-  damageBonus: -1
+  itemName: "\uAE30\uC0DD\uCDA9"
+  description: "\uBA39\uC73C\uBA74 \uC548\uB420\uAC70 \uAC19\uC740\uB370.. / \uACF5\uACA9\uB825
+    - 2 \uACF5\uACA9\uC18D\uB3C4 + 1.5"
+  itemSprite: {fileID: 21300000, guid: 629ea79d6f654ad4a9f80aae6db87250, type: 3}
+  price: 20
+  damageBonus: -2
   rangeBonus: 0
-  attackSpeedBonus: 0
-  moveSpeedBonus: 1
+  attackSpeedBonus: 1.5
+  moveSpeedBonus: 0
